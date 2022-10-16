@@ -135,6 +135,7 @@ class MainController{
             url = 'https://api.scryfall.com/cards/search' + searchQuery;
 
             console.log('going to scryfall for ' + typedName + ' (' + cardname + ')');
+            $('#console').html('going to scryfall for ' + typedName)
             await fetch(url)
                 .then((response) => response.json())
                 .then((data) => {
@@ -429,17 +430,17 @@ $(function() {
     $('#displayList').on('click', '.card-div', function(e) {
         var cardIndex = parseInt($(this).attr('card_index'));
         var currentStatus = window.mainController.cardList[cardIndex].status;
-        var statusIndex = window.mainController.card_status.indexOf(currentStatus);
+        var statusIndex = window.mainController.state.card_status.indexOf(currentStatus);
         var newStatus = '';
         var newStatusIndex = 0;
-        if(statusIndex == window.mainController.card_status.length - 1){
+        if(statusIndex == window.mainController.state.card_status.length - 1){
             newStatusIndex = 0;
         }else{
             newStatusIndex = statusIndex + 1;
         }
-        newStatus = window.mainController.card_status[newStatusIndex];
+        newStatus = window.mainController.state.card_status[newStatusIndex];
         window.mainController.cardList[cardIndex].status = newStatus;
-        $(this).children('.status-icon').html(newStatus);
+        $(this).children('.status-row').children('.status-icon').html(newStatus);
         window.mainController.saveState();
     });
 

@@ -1,3 +1,9 @@
+#console{
+	background-color: 090909;
+	color: #00FF09;
+	font-family: Courier New;
+}
+
 .list-button{
 	margin-top: 6px;
 }
