@@ -1,0 +1,17 @@
+collections: 
+    https://scryfall.com/docs/api/cards/collection
+    url = 'https://api.scryfall.com/cards/oracle'
+    data = {
+      "identifiers": [
+        {
+          "name": "Ancient Tomb"
+        },
+        {
+          "name": "pikachu"
+        }
+      ]
+    }
+
+
+card by oracle_id:
+    https://api.scryfall.com/cards/oracle/[oracle_id]
