@@ -20,9 +20,42 @@
             <textarea class="form-control" id="cardListEntry" rows="10"></textarea>
             <button id="cardListEntrySubmit" type="button" class="btn btn-primary list-button">Make Find List</button>
             <button id="cardListClear" type="button" class="btn btn-danger list-button">Clear card list</button>
+            <button id="storageClear" type="button" class="btn btn-danger list-button">Clear storage</button>
           </div>
         </div>
         <div id="console" class="row mb-3">
+        </div>
+      </div>
+      <div id="filter-control" class="container">
+        <div class="row">
+          <div class="col-4">
+            <select id="color-filter" class="form-select">
+              <option value="all" selected>Color (all)</option>
+              <option value="W">White</option>
+              <option value="U">Blue</option>
+              <option value="B">Black</option>
+              <option value="R">Red</option>
+              <option value="G">Green</option>
+            </select>
+          </div>
+          <div class="col-4">
+            <select id="rarity-filter" class="form-select">
+              <option value="all" selected>Rarity (all)</option>
+              <option value="common">Common</option>
+              <option value="uncommon">Uncommon</option>
+              <option value="rare">Rare</option>
+              <option value="mythic">Mythic</option>
+            </select>
+          </div>
+          <div class="col-4">
+            <select id="status-filter" class="form-select">
+              <option value="all" selected>Status (all)</option>
+              <option value="&nbsp;">&lt;blank&gt;</option>
+              <option value="✅">✅</option>
+              <option value="💰">💰</option>
+              <option value="❓">❓</option>
+            </select>
+          </div>
         </div>
       </div>
       <div id="displayList" class="container">

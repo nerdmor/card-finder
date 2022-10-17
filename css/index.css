@@ -1,5 +1,5 @@
 #console{
-	background-color: 090909;
+	background-color: #090909;
 	color: #00FF09;
 	font-family: Courier New;
 }
@@ -37,7 +37,7 @@
 }
 
 .rarity-row{
-	padding-left: 12px;
+	padding-left: 0.1em;
 	margin-top: -54px;
 }
 
@@ -53,5 +53,5 @@ img {
 	display: inline-flex;
 	text-align: center;
 	margin-top: -1.7em;
-	font-size: 8.5em;
+	font-size: 6.5em;
 }

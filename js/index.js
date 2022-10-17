@@ -26,7 +26,12 @@ class MainController{
                 '✅',
                 '💰',
                 '❓'
-            ]
+            ],
+            'filters': {
+                'color': null,
+                'rarity': null,
+                'status': null
+            }
         };
         this.loadState();
         this.setBody();
@@ -52,6 +57,9 @@ class MainController{
     clearCardList(){
         this.cardList = [];
         this.groupedCardList = null;
+        this.state.filters.color = null;
+        this.state.filters.rarity = null;
+        this.state.filters.status = null;
         $('#cardListEntry').val('');
         $('#displayList').html('');
         this.saveState();
@@ -131,14 +139,16 @@ class MainController{
             }
 
 
-            searchQuery = encodeURI('?unique=print&q=!"' + cardname + '"');
+            searchQuery = encodeURI('?unique=prints&q=!"' + cardname + '"');
             url = 'https://api.scryfall.com/cards/search' + searchQuery;
+            console.log(url);
 
             console.log('going to scryfall for ' + typedName + ' (' + cardname + ')');
-            $('#console').html('going to scryfall for ' + typedName)
+            $('#console').html('going to scryfall for ' + typedName);
             await fetch(url)
                 .then((response) => response.json())
                 .then((data) => {
+                    console.log(data);
                     var response_status = data.status || 200;
                     var firstFace = {};
                     if(response_status != 200){
@@ -201,6 +211,7 @@ class MainController{
                 await delay(100);
             }
         }
+        $('#console').html('');
 
         this.cardList = this.cardList.concat(cardList);
         for (var i = 0; i < this.cardList.length; i++) {
@@ -213,9 +224,8 @@ class MainController{
 
     displayCards(){
         // TODO: make this respect a given sorting order
-        this.groupedCardList = null;
-        this.groupedCardList = this.sortCardsByColor();
-        this.groupedCardList = this.sortCardsByRarity();
+        this.groupedCardList = this.sortCardsByColor(this.cardList, this.state.filters.color);
+        this.groupedCardList = this.sortCardsByRarity(this.groupedCardList, this.state.filters.rarity);
         this.populateDisplayList();
     }
 
@@ -227,7 +237,7 @@ class MainController{
             group = JSON.parse(JSON.stringify(group));
         }
 
-        for (const [key, value] of Object.entries(group)) {
+        for (var [key, value] of Object.entries(group)) {
             if(value.constructor !== Array){
                 value = this.flattenGroup(value);
             }
@@ -255,11 +265,50 @@ class MainController{
         var rarityDiv = '';
         var cardRarities = [];
         var cardStatus = '';
+        const validColors = ['W', 'U', 'B', 'R', 'G'];
         for (var i = 0; i < cardList.length; i++) {
             card = cardList[i];
+
             if(!card.scryfound){
                 continue;
             }
+
+            // filter block
+            if(this.state.filters.status){
+                if(this.state.filters.status == '&nbsp;' && card.status != '&nbsp;' && card.status !== null){
+                    continue;
+                }
+                if(this.state.filters.status != card.status){
+                    continue;
+                }
+            }
+
+            if (this.state.filters.rarity !== null){
+                if(!card.rarities.includes(this.state.filters.rarity)){
+                    continue;
+                }
+            }
+
+            if(this.state.filters.color !== null){
+                if(this.state.filters.color == 'land' && card.is_land == false){
+                    continue;
+                }
+                if(this.state.filters.color == 'c' && (card.color !== null  || card.color.length > 0)){
+                    continue;
+                }
+                if(this.state.filters.color == 'multi' && (card.color === null || card.color.length < 2)){
+                    continue;
+                }
+                if(validColors.includes(this.state.filters.color) && card.color != this.state.filters.color){
+                    continue;
+                }
+            }
+
+
+
+
+
+
 
             for (var j = card.rarities.length - 1; j >= 0; j--) {
                 rarityDiv = window.mainModels.rarity;
@@ -314,14 +363,13 @@ class MainController{
             cardList = JSON.parse(JSON.stringify(cardList));
         }
 
-        var result = {};
 
+        var result = {};
         if(cardList.constructor != Array){
             for (const [key, value] of Object.entries(cardList)) {
                 result[key] = this.sortCardsByColor(value);
             }
-            this.groupedCardList = result;
-            return;
+            return result;
         }
 
         result = {
@@ -350,17 +398,6 @@ class MainController{
             }else{
                 result[card.color].push(card);
             }
-
-        }
-
-        var removeKeys = [];
-        for (const [key, value] of Object.entries(result)) {
-            if(value.length < 1){
-                removeKeys.push(key);
-            }
-        }
-        for (var i = 0; i < removeKeys.length; i++) {
-            delete result[removeKeys[i]];
         }
 
         return result;
@@ -381,10 +418,8 @@ class MainController{
             for (const [key, value] of Object.entries(cardList)) {
                 result[key] = this.sortCardsByRarity(value);
             }
-            this.groupedCardList = result;
-            return;
+            return result;
         }
-
 
         result = {
             'common': [],
@@ -395,18 +430,6 @@ class MainController{
 
         for (var i = 0; i < cardList.length; i++) {
             result[cardList[i].rarities[0]].push(cardList[i]);
-        }
-
-
-
-        var removeKeys = [];
-        for (const [key, value] of Object.entries(result)) {
-            if(value.length < 1){
-                removeKeys.push(key);
-            }
-        }
-        for (var i = 0; i < removeKeys.length; i++) {
-            delete result[removeKeys[i]];
         }
 
         return result;
@@ -446,5 +469,45 @@ $(function() {
 
     $('#cardListClear').on('click', function(e) {
         window.mainController.clearCardList();
+        $('#color-filter').val('all');
+        $('#rarity-filter').val('all');
+        $('#status-filter').val('all');
+    });
+
+    $('#color-filter').on('change', function() {
+        const value = $(this).val();
+        if(value == 'all'){
+            window.mainController.state.filters.color = null;
+        }else{
+            window.mainController.state.filters.color = value;
+        }
+        window.mainController.saveState();
+        window.mainController.displayCards();
+    });
+
+    $('#rarity-filter').on('change', function() {
+        const value = $(this).val();
+        if(value == 'all'){
+            window.mainController.state.filters.rarity = null;
+        }else{
+            window.mainController.state.filters.rarity = value;
+        }
+        window.mainController.saveState();
+        window.mainController.displayCards();
+    });
+
+    $('#status-filter').on('change', function() {
+        const value = $(this).val();
+        if(value == 'all'){
+            window.mainController.state.filters.status = null;
+        }else{
+            window.mainController.state.filters.status = value;
+        }
+        window.mainController.saveState();
+        window.mainController.displayCards();
+    });
+
+    $('#storageClear').on('click', function(e) {
+        localStorage.clear();
     });
 });
