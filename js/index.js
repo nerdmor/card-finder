@@ -14,6 +14,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 
 class MainController{
     constructor(){
+        this.version = '0.2';
         this.cardList = [];
         this.groupedCardList = null;
         this.state = {
@@ -23,24 +24,36 @@ class MainController{
             'group_order': ['color', 'rarity', 'cmc'],
             'card_status': [
                 '&nbsp;',
-                '✅',
-                '💰',
-                '❓'
+                '✔️',
+                '💲',
+                '❔',
+                '⭕'
             ],
             'filters': {
                 'color': null,
                 'rarity': null,
                 'status': null
-            }
+            },
+            'version': this.version
         };
         this.loadState();
         this.setBody();
+    }
+
+    clearAndReload(){
+        console.log('clear and reload triggered');
+        localStorage.clear();
+        location.reload(true);
     }
 
     loadState(){
         if(localStorage.getItem('state')){
             this.cardList = JSON.parse(localStorage.getItem('cardList'));
             this.state = JSON.parse(localStorage.getItem('state'));
+            this.state.version = this.state.version || '0.0';
+            if(this.state.version != this.version){
+                this.clearAndReload();
+            }
             if(this.cardList.length > 0){
                 this.displayCards();
             }
@@ -72,6 +85,7 @@ class MainController{
     }
 
     async parseCardList(){
+        this.blockInput();
         var typedList = $('#cardListEntry').val();
         if(!typedList){
             return;
@@ -141,14 +155,12 @@ class MainController{
 
             searchQuery = encodeURI('?unique=prints&q=!"' + cardname + '"');
             url = 'https://api.scryfall.com/cards/search' + searchQuery;
-            console.log(url);
 
             console.log('going to scryfall for ' + typedName + ' (' + cardname + ')');
             $('#console').html('going to scryfall for ' + typedName);
             await fetch(url)
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
                     var response_status = data.status || 200;
                     var firstFace = {};
                     if(response_status != 200){
@@ -214,18 +226,18 @@ class MainController{
         $('#console').html('');
 
         this.cardList = this.cardList.concat(cardList);
-        for (var i = 0; i < this.cardList.length; i++) {
-            this.cardList[i].index = i;
-        }
         this.groupedCardList = null;
         this.saveState();
         this.displayCards();
+        this.enableInput();
     }
 
     displayCards(){
+        this.ensureIndex();
         // TODO: make this respect a given sorting order
-        this.groupedCardList = this.sortCardsByColor(this.cardList, this.state.filters.color);
-        this.groupedCardList = this.sortCardsByRarity(this.groupedCardList, this.state.filters.rarity);
+        this.groupedCardList = null;
+        this.groupedCardList = this.sortCardsByColor();
+        this.groupedCardList = this.sortCardsByRarity(this.groupedCardList);
         this.populateDisplayList();
     }
 
@@ -247,16 +259,45 @@ class MainController{
         return result;
     }
 
+    ensureIndex(){
+        for (var i = this.cardList.length - 1; i >= 0; i--) {
+            this.cardList[i].index = i;
+        }
+    }
+
+    blockInput(){
+        $('.input-control').each(function(i, val) {
+             $(this).prop("disabled", true);
+        });
+
+        $('#cardListEntrySubmit').removeClass('btn-primary').addClass('btn-secondary')
+        $('#cardListClear').removeClass('btn-danger').addClass('btn-secondary')
+        $('#storageClear').removeClass('btn-danger').addClass('btn-secondary')
+
+    }
+
+    enableInput(){
+        $('.input-control').each(function(i, val) {
+             $(this).prop("disabled", true);
+        });
+
+        $('#cardListEntrySubmit').removeClass('btn-secondary').addClass('btn-primary')
+        $('#cardListClear').removeClass('btn-secondary').addClass('btn-danger')
+        $('#storageClear').removeClass('btn-secondary').addClass('btn-danger')
+    }
+
     populateDisplayList(){
         console.log('calling populateDisplayList')
+        $('#console').html('Thinking, please wait');
         var cardList = [];
         if(this.groupedCardList != null){
             cardList = this.flattenGroup();
         }else{
-            cardList = this.cardList;
+            cardList = [];
+            for (var i = 0; i < this.cardList.length; i++) {
+                cardList.push(i);
+            }
         }
-
-
 
         var displayList = [];
 
@@ -267,13 +308,15 @@ class MainController{
         var cardStatus = '';
         const validColors = ['W', 'U', 'B', 'R', 'G'];
         for (var i = 0; i < cardList.length; i++) {
-            card = cardList[i];
+            card = this.cardList[cardList[i]];
 
             if(!card.scryfound){
                 continue;
             }
 
-            // filter block
+            /* *****************************************************************
+             * filter block
+             * ****************************************************************/
             if(this.state.filters.status){
                 if(this.state.filters.status == '&nbsp;' && card.status != '&nbsp;' && card.status !== null){
                     continue;
@@ -303,10 +346,7 @@ class MainController{
                     continue;
                 }
             }
-
-
-
-
+            /* end filter block ***********************************************/
 
 
 
@@ -352,16 +392,22 @@ class MainController{
 
         var displayDiv = window.mainModels.card_row.replaceAll('%%cards%%', displayList.join('\n'));
         $('#displayList').html(displayDiv);
+        $('#console').html('');
     }
 
     sortCardsByColor(cardList=null){
         console.log('sorting cards by color')
         if(cardList === null){
-            cardList = this.groupedCardList || this.cardList;
-            cardList = JSON.parse(JSON.stringify(cardList));
-        }else{
-            cardList = JSON.parse(JSON.stringify(cardList));
+            cardList = [];
+            if(this.groupedCardList){
+                cardList = this.groupedCardList;
+            }else{
+                for (var i = 0; i < this.cardList.length; i++) {
+                    cardList.push(i);
+                }
+            }
         }
+        cardList = JSON.parse(JSON.stringify(cardList));
 
 
         var result = {};
@@ -385,18 +431,18 @@ class MainController{
 
         var card = {};
         for (var i = 0; i < cardList.length; i++) {
-            card = cardList[i];
+            card = this.cardList[cardList[i]];
 
             if(card.is_land === true){
-                result['land'].push(card);
+                result['land'].push(card.index);
             }else if(card.color === null){
-                result['c'].push(card);
+                result['c'].push(card.index);
             }else if(card.color.length == 0){
-                result['c'].push(card);
+                result['c'].push(card.index);
             }else if(card.color.length > 1){
-                result['multi'].push(card);
+                result['multi'].push(card.index);
             }else{
-                result[card.color].push(card);
+                result[card.color].push(card.index);
             }
         }
 
@@ -407,15 +453,21 @@ class MainController{
     sortCardsByRarity(cardList=null){
         console.log('sorting cards by rarities')
         if(cardList === null){
-            cardList = this.groupedCardList || this.cardList;
-            cardList = JSON.parse(JSON.stringify(cardList));
-        }else{
-            cardList = JSON.parse(JSON.stringify(cardList));
+            cardList = [];
+            if(this.groupedCardList){
+                cardList = this.groupedCardList;
+            }else{
+                for (var i = 0; i < this.cardList.length; i++) {
+                    cardList.push(this.cardList[i].index);
+                }
+            }
         }
+        cardList = JSON.parse(JSON.stringify(cardList));
 
         var result = {};
         if(cardList.constructor != Array){
             for (const [key, value] of Object.entries(cardList)) {
+                console.log('sorting by rarity under ' + key);
                 result[key] = this.sortCardsByRarity(value);
             }
             return result;
@@ -429,7 +481,7 @@ class MainController{
         };
 
         for (var i = 0; i < cardList.length; i++) {
-            result[cardList[i].rarities[0]].push(cardList[i]);
+            result[this.cardList[cardList[i]].rarities[0]].push(cardList[i]);
         }
 
         return result;
@@ -438,11 +490,24 @@ class MainController{
 }
 
 
-
+// startup block
 $(function() {
     window.mainController = window.mainController || 1;
     if(window.mainController == 1){
         window.mainController = new MainController;
+    }
+
+    var tmp = '';
+    for (var i = 0; i < window.mainController.state.card_status.length; i++) {
+        if(window.mainController.state.card_status[i] == '&nbsp;'){
+            tmp = '<blank>';
+        }else{
+            tmp = window.mainController.state.card_status[i];
+        }
+        $('#status-filter').append($('<option>', {
+            'value': window.mainController.state.card_status[i],
+            'text': tmp
+        }));
     }
 
     $('body').on('click', '#cardListEntrySubmit', function(event) {
@@ -472,6 +537,10 @@ $(function() {
         $('#color-filter').val('all');
         $('#rarity-filter').val('all');
         $('#status-filter').val('all');
+    });
+
+    $('#storageClear').on('click', function(e) {
+        window.mainController.clearAndReload();
     });
 
     $('#color-filter').on('change', function() {
@@ -507,7 +576,4 @@ $(function() {
         window.mainController.displayCards();
     });
 
-    $('#storageClear').on('click', function(e) {
-        localStorage.clear();
-    });
 });

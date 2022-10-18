@@ -17,10 +17,10 @@
           </div>
           <div id="home_input" class="col-8">
             <label for="cardListEntry" class="form-label">Your card list</label>
-            <textarea class="form-control" id="cardListEntry" rows="10"></textarea>
-            <button id="cardListEntrySubmit" type="button" class="btn btn-primary list-button">Make Find List</button>
-            <button id="cardListClear" type="button" class="btn btn-danger list-button">Clear card list</button>
-            <button id="storageClear" type="button" class="btn btn-danger list-button">Clear storage</button>
+            <textarea class="form-control input-control" id="cardListEntry" rows="10"></textarea>
+            <button id="cardListEntrySubmit" type="button" class="btn btn-primary list-button input-control">Make Find List</button>
+            <button id="cardListClear" type="button" class="btn btn-danger list-button input-control">Clear card list</button>
+            <button id="storageClear" type="button" class="btn btn-danger list-button input-control">Clear storage</button>
           </div>
         </div>
         <div id="console" class="row mb-3">
@@ -29,17 +29,20 @@
       <div id="filter-control" class="container">
         <div class="row">
           <div class="col-4">
-            <select id="color-filter" class="form-select">
+            <select id="color-filter" class="form-select input-control">
               <option value="all" selected>Color (all)</option>
               <option value="W">White</option>
               <option value="U">Blue</option>
               <option value="B">Black</option>
               <option value="R">Red</option>
               <option value="G">Green</option>
+              <option value="multi">Multicolor</option>
+              <option value="c">Colorless</option>
+              <option value="land">Land</option>
             </select>
           </div>
           <div class="col-4">
-            <select id="rarity-filter" class="form-select">
+            <select id="rarity-filter" class="form-select input-control">
               <option value="all" selected>Rarity (all)</option>
               <option value="common">Common</option>
               <option value="uncommon">Uncommon</option>
@@ -48,12 +51,8 @@
             </select>
           </div>
           <div class="col-4">
-            <select id="status-filter" class="form-select">
+            <select id="status-filter" class="form-select input-control">
               <option value="all" selected>Status (all)</option>
-              <option value="&nbsp;">&lt;blank&gt;</option>
-              <option value="✅">✅</option>
-              <option value="💰">💰</option>
-              <option value="❓">❓</option>
             </select>
           </div>
         </div>
