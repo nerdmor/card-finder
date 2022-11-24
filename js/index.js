@@ -141,7 +141,7 @@ class MainController{
                 'sets': {},
                 'images': {},
                 'rarities': [],
-                'color': null,
+                'color': '',
                 'cmc': null,
                 'is_land': null,
                 'oracle_id': null,
@@ -189,7 +189,10 @@ class MainController{
 
                             newCard.sets[scrycard['set']] = scrycard['rarity'];
                             newCard.images[scrycard['set']] = firstFace.image_uris.normal;
-                            newCard.rarities.push(scrycard['rarity']);
+                            // newCard.rarities.push(scrycard['rarity']);
+                            if(scrycard['rarity'] != 'special'){
+                                newCard.rarities.push(scrycard['rarity']);
+                            }
                         }
 
                         newCard.rarities = onlyUnique(newCard.rarities);
@@ -423,10 +426,10 @@ class MainController{
                 if(this.state.filters.color == 'land' && card.is_land == false){
                     continue;
                 }
-                if(this.state.filters.color == 'c' && (card.color !== null  || card.color.length > 0)){
+                if(this.state.filters.color == 'c' && card.color.length > 0){
                     continue;
                 }
-                if(this.state.filters.color == 'multi' && (card.color === null || card.color.length < 2)){
+                if(this.state.filters.color == 'multi' && card.color.length < 2){
                     continue;
                 }
                 if(validColors.includes(this.state.filters.color) && card.color != this.state.filters.color){
@@ -562,7 +565,8 @@ class MainController{
             'common': [],
             'uncommon': [],
             'rare': [],
-            'mythic': []
+            'mythic': [],
+            'special': []
         };
 
         for (var i = 0; i < cardList.length; i++) {
