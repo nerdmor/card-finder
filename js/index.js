@@ -14,7 +14,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 
 class MainController{
     constructor(){
-        this.version = '0.3';
+        this.version = '0.4';
         this.cardList = [];
         this.groupedCardList = null;
         this.state = {
@@ -185,7 +185,6 @@ class MainController{
                                 for (var c = 0; c < firstFace.colors.length; c++) {
                                     newCard.color.push(firstFace.colors[c]);
                                 }
-                                // newCard.color = firstFace.colors.join('');
                                 if(firstFace.type_line.indexOf('Land') > -1){
                                     newCard.is_land = true;
                                 }else{
