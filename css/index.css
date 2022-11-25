@@ -60,3 +60,34 @@ img {
 	color: #A0A0A0;
 	font-size: 0.7em;
 }
+
+.filter-container{
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+	border-style: solid;
+	border-color: #909090;
+	border-width: 0.5px;
+}
+
+.filter-container-right{
+	border-left-style: none;
+}
+
+.filter-container-left{
+	border-right-style: none;
+}
+
+.filter-list{
+    padding: 0.5em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+}
+
+.filter-element{
+    float: left;
+    margin-right: 0.1em;
+}
+
+.filter-element-text{
+    cursor: default;
+}

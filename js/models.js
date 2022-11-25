@@ -14,5 +14,12 @@ window.mainModels = {
     	<div class="col-sm-2 rarity-symbol">
             <img src="img/mtg_%%rarity%%.png">
         </div>`,
-    'card_row': `<div class="row mb-3 card_row">%%cards%%</div>`
+    'card_row': `<div class="row mb-3 card_row">%%cards%%</div>`,
+    'filter_element': `
+        <div class="filter-element">
+          <div class="input-group">
+            <span class="btn btn-sm btn-secondary filter-element-text">%%displayValue%%</span>
+            <button type="button" class="btn btn-outline-secondary filter-remove-btn" value="%%filterValue%%" filter_type="%%filterType%%">🗑️</button>
+          </div>
+        </div>`
 };

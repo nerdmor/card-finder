@@ -30,9 +30,9 @@ class MainController{
                 '⭕'
             ],
             'filters': {
-                'color': null,
-                'rarity': null,
-                'status': null
+                'color': [],
+                'rarity': [],
+                'status': []
             },
             'version': this.version
         };
@@ -54,6 +54,11 @@ class MainController{
             if(this.state.version != this.version){
                 this.clearAndReload();
             }
+
+            if(this.state.filters.color == null) this.state.filters.color = [];
+            if(this.state.filters.rarity == null) this.state.filters.rarity = [];
+            if(this.state.filters.status == null) this.state.filters.status = [];
+
             if(this.cardList.length > 0){
                 this.displayCards();
             }
@@ -70,9 +75,9 @@ class MainController{
     clearCardList(){
         this.cardList = [];
         this.groupedCardList = null;
-        this.state.filters.color = null;
-        this.state.filters.rarity = null;
-        this.state.filters.status = null;
+        this.state.filters.color = [];
+        this.state.filters.rarity = [];
+        this.state.filters.status = [];
         $('#cardListEntry').val('');
         $('#displayList').html('');
         this.saveState();
@@ -94,8 +99,6 @@ class MainController{
         if(typedList.length < 1){
             return;
         }
-
-        // var oldList = JSON.parse(JSON.stringify(this.cardList));
 
         var existingNames = [];
         for (var i = 0; i < this.cardList.length; i++) {
@@ -141,7 +144,7 @@ class MainController{
                 'sets': {},
                 'images': {},
                 'rarities': [],
-                'color': '',
+                'color': [],
                 'cmc': null,
                 'is_land': null,
                 'oracle_id': null,
@@ -179,7 +182,10 @@ class MainController{
                                 newCard.cmc = scrycard.cmc;
 
                                 newCard.name = firstFace.name;
-                                newCard.color = firstFace.colors.join('');
+                                for (var c = 0; c < firstFace.colors.length; c++) {
+                                    newCard.color.push(firstFace.colors[c]);
+                                }
+                                // newCard.color = firstFace.colors.join('');
                                 if(firstFace.type_line.indexOf('Land') > -1){
                                     newCard.is_land = true;
                                 }else{
@@ -189,10 +195,11 @@ class MainController{
 
                             newCard.sets[scrycard['set']] = scrycard['rarity'];
                             newCard.images[scrycard['set']] = firstFace.image_uris.normal;
-                            // newCard.rarities.push(scrycard['rarity']);
-                            if(scrycard['rarity'] != 'special'){
-                                newCard.rarities.push(scrycard['rarity']);
-                            }
+
+                            newCard.rarities.push(scrycard['rarity']);
+                            // if(scrycard['rarity'] != 'special'){
+                            //     newCard.rarities.push(scrycard['rarity']);
+                            // }
                         }
 
                         newCard.rarities = onlyUnique(newCard.rarities);
@@ -218,7 +225,7 @@ class MainController{
                 .catch((error) => {
                     console.error('Error:', error);
                 });
-            console.log(newCard);
+            // console.log(newCard);
 
             cardList.push(newCard);
             if(i < typedList.length -1){
@@ -281,7 +288,9 @@ class MainController{
                             newCard.cmc = scrycard.cmc;
 
                             newCard.name = firstFace.name;
-                            newCard.color = firstFace.colors.join('');
+                            for (var c = 0; c < firstFace.colors.length; c++) {
+                                newCard.color.push(firstFace.colors[c]);
+                            }
                             if(firstFace.type_line.indexOf('Land') > -1){
                                 newCard.is_land = true;
                             }else{
@@ -329,6 +338,69 @@ class MainController{
         this.groupedCardList = this.sortCardsByRarity(this.groupedCardList);
         this.groupedCardList = this.sortCardsByCost(this.groupedCardList);
         this.populateDisplayList();
+        this.populateFilterLists();
+    }
+
+    populateFilterLists(){
+        var filterElements = [];
+        var newFilter = '';
+
+        // color
+        for (var i = 0; i < this.state.filters.color.length; i++) {
+            newFilter = window.mainModels.filter_element;
+            newFilter = newFilter.replaceAll('%%filterValue%%', this.state.filters.color[i]);
+            newFilter = newFilter.replaceAll('%%filterType%%', 'color');
+
+            if(this.state.filters.color[i] == 'W'){
+                newFilter = newFilter.replaceAll('%%displayValue%%', 'White');
+            }else if(this.state.filters.color[i] == 'U'){
+                newFilter = newFilter.replaceAll('%%displayValue%%', 'Blue');
+            }else if(this.state.filters.color[i] == 'B'){
+                newFilter = newFilter.replaceAll('%%displayValue%%', 'Black');
+            }else if(this.state.filters.color[i] == 'R'){
+                newFilter = newFilter.replaceAll('%%displayValue%%', 'Red');
+            }else if(this.state.filters.color[i] == 'G'){
+                newFilter = newFilter.replaceAll('%%displayValue%%', 'Green');
+            }else if(this.state.filters.color[i] == 'multi'){
+                newFilter = newFilter.replaceAll('%%displayValue%%', 'Multicolor');
+            }else if(this.state.filters.color[i] == 'c'){
+                newFilter = newFilter.replaceAll('%%displayValue%%', 'Colorless');
+            }else if(this.state.filters.color[i] == 'land'){
+                newFilter = newFilter.replaceAll('%%displayValue%%', 'Land');
+            }else{
+                continue;
+            }
+
+            filterElements.push(newFilter);
+        }
+        $('#filterListColor').html(filterElements.join('\n'));
+
+        // rarity
+        filterElements = [];
+        for (var i = 0; i < this.state.filters.rarity.length; i++) {
+            newFilter = window.mainModels.filter_element;
+            newFilter = newFilter.replaceAll('%%filterValue%%', this.state.filters.rarity[i]);
+            newFilter = newFilter.replaceAll('%%filterType%%', 'rarity');
+            newFilter = newFilter.replaceAll('%%displayValue%%', this.state.filters.rarity[i].substring(0,1).toUpperCase() + this.state.filters.rarity[i].substring(1));
+            filterElements.push(newFilter);
+        }
+        $('#filterListRarity').html(filterElements.join('\n'));
+
+
+        // status
+        filterElements = [];
+        for (var i = 0; i < this.state.filters.status.length; i++) {
+            newFilter = window.mainModels.filter_element;
+            newFilter = newFilter.replaceAll('%%filterValue%%', this.state.filters.status[i]);
+            newFilter = newFilter.replaceAll('%%filterType%%', 'status');
+            if(this.state.filters.status[i] == '&nbsp;'){
+                newFilter = newFilter.replaceAll('%%displayValue%%', '[blank]');
+            }else{
+                newFilter = newFilter.replaceAll('%%displayValue%%', this.state.filters.status[i]);
+            }
+            filterElements.push(newFilter);
+        }
+        $('#filterListStatus').html(filterElements.join('\n'));
     }
 
     flattenGroup(group=null){
@@ -397,6 +469,7 @@ class MainController{
         var cardRarities = [];
         var cardStatus = '';
         const validColors = ['W', 'U', 'B', 'R', 'G'];
+        var keepCard = false;
         for (var i = 0; i < cardList.length; i++) {
             card = this.cardList[cardList[i]];
 
@@ -407,32 +480,40 @@ class MainController{
             /* *****************************************************************
              * filter block
              * ****************************************************************/
-            if(this.state.filters.status){
-                if(this.state.filters.status == '&nbsp;' && card.status != '&nbsp;' && card.status !== null){
-                    continue;
-                }
-                if(this.state.filters.status != card.status){
+            if(this.state.filters.status.length > 0){
+                if(!this.state.filters.status.includes(card.status)){
                     continue;
                 }
             }
 
-            if (this.state.filters.rarity !== null){
-                if(!card.rarities.includes(this.state.filters.rarity)){
+
+            if (this.state.filters.rarity.length > 0){
+                keepCard = false;
+                for (var k = 0; k < this.state.filters.rarity.length; k++) {
+                    if(card.rarities.includes(this.state.filters.rarity[k])){
+                        keepCard = true;
+                        break;
+                    }
+                }
+                if (!keepCard){
                     continue;
                 }
             }
 
-            if(this.state.filters.color !== null){
-                if(this.state.filters.color == 'land' && card.is_land == false){
-                    continue;
+
+            if(this.state.filters.color.length > 0){
+                keepCard = false;
+                if(this.state.filters.color.includes('land') && card.is_land == true){
+                    keepCard = true;
+                }else if(this.state.filters.color.includes('c') && card.color.length == 0 && card.is_land == false){
+                    keepCard = true;
+                }else if(this.state.filters.color.includes('multi') && card.color.length >= 2){
+                    keepCard = true;
+                }else if(card.color.length == 1 && this.state.filters.color.includes(card.color[0])){
+                    keepCard = true;
                 }
-                if(this.state.filters.color == 'c' && card.color.length > 0){
-                    continue;
-                }
-                if(this.state.filters.color == 'multi' && card.color.length < 2){
-                    continue;
-                }
-                if(validColors.includes(this.state.filters.color) && card.color != this.state.filters.color){
+
+                if(keepCard == false){
                     continue;
                 }
             }
@@ -457,13 +538,7 @@ class MainController{
                 cardRarities.push(rarityDiv);
             }
 
-            if(card.status === null){
-                cardStatus = '&nbsp;';
-            }else{
-                cardStatus = card.status;
-            }
-
-
+            card.status = card.status || '&nbsp;';
             cardDiv = window.mainModels.card
                         .replaceAll('%%card_quantity%%', card.quantity)
                         .replaceAll('%%status_icon%%', cardStatus)
@@ -525,8 +600,6 @@ class MainController{
 
             if(card.is_land === true){
                 result['land'].push(card.index);
-            }else if(card.color === null){
-                result['c'].push(card.index);
             }else if(card.color.length == 0){
                 result['c'].push(card.index);
             }else if(card.color.length > 1){
@@ -642,7 +715,7 @@ $(function() {
     var tmp = '';
     for (var i = 0; i < window.mainController.state.card_status.length; i++) {
         if(window.mainController.state.card_status[i] == '&nbsp;'){
-            tmp = '<blank>';
+            tmp = '[blank]';
         }else{
             tmp = window.mainController.state.card_status[i];
         }
@@ -685,37 +758,78 @@ $(function() {
         window.mainController.clearAndReload();
     });
 
-    $('#color-filter').on('change', function() {
-        const value = $(this).val();
-        if(value == 'all'){
-            window.mainController.state.filters.color = null;
-        }else{
-            window.mainController.state.filters.color = value;
+    $('.filter-list').on('click', '.filter-remove-btn', function(e) {
+        e.preventDefault();
+        var value = $(this).attr('value');
+        const filterType = $(this).attr('filter_type');
+        var doUpdate = false;
+        if(filterType == 'color'){
+            for (var i = 0; i < window.mainController.state.filters.color.length; i++) {
+                if(window.mainController.state.filters.color[i] == value){
+                    window.mainController.state.filters.color.splice(i, 1);
+                    doUpdate = true;
+                    break;
+                }
+            }
+        }else if(filterType == 'rarity'){
+            for (var i = 0; i < window.mainController.state.filters.rarity.length; i++) {
+                if(window.mainController.state.filters.rarity[i] == value){
+                    window.mainController.state.filters.rarity.splice(i, 1);
+                    doUpdate = true;
+                    break;
+                }
+            }
+        }else if(filterType == 'status'){
+            if(value.match(/^\s+$/g)){
+                value = '&nbsp;';
+            }
+            for (var i = 0; i < window.mainController.state.filters.status.length; i++) {
+                if(window.mainController.state.filters.status[i] == value){
+                    window.mainController.state.filters.status.splice(i, 1);
+                    doUpdate = true;
+                    break;
+                }
+            }
         }
-        window.mainController.saveState();
-        window.mainController.displayCards();
+
+        if(doUpdate){
+            window.mainController.saveState();
+            window.mainController.displayCards();
+        }
     });
 
-    $('#rarity-filter').on('change', function() {
-        const value = $(this).val();
-        if(value == 'all'){
-            window.mainController.state.filters.rarity = null;
-        }else{
-            window.mainController.state.filters.rarity = value;
+    $('#addFilterColor').on('click', function(e) {
+        e.preventDefault();
+        const value = $('#color-filter').val();
+        if(value != 'all' && !window.mainController.state.filters.color.includes(value)){
+            window.mainController.state.filters.color.push(value);
+            window.mainController.saveState();
+            window.mainController.displayCards();
+            $('#color-filter').val('all');
         }
-        window.mainController.saveState();
-        window.mainController.displayCards();
     });
 
-    $('#status-filter').on('change', function() {
-        const value = $(this).val();
-        if(value == 'all'){
-            window.mainController.state.filters.status = null;
-        }else{
-            window.mainController.state.filters.status = value;
+    $('#addFilterRarity').on('click', function(e) {
+        e.preventDefault();
+        const value = $('#rarity-filter').val();
+        if(value != 'all' && !window.mainController.state.filters.rarity.includes(value)){
+            window.mainController.state.filters.rarity.push(value);
+            window.mainController.saveState();
+            window.mainController.displayCards();
+            $('#rarity-filter').val('all');
         }
-        window.mainController.saveState();
-        window.mainController.displayCards();
+    });
+
+    $('#addFilterStatus').on('click', function(e) {
+        e.preventDefault();
+        const value = $('#status-filter').val();
+        console.log(value);
+        if(value != 'all' && !window.mainController.state.filters.status.includes(value)){
+            window.mainController.state.filters.status.push(value);
+            window.mainController.saveState();
+            window.mainController.displayCards();
+            $('#status-filter').val('all');
+        }
     });
 
 });
