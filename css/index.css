@@ -66,15 +66,24 @@ img {
     padding-bottom: 0.5em;
 	border-style: solid;
 	border-color: #909090;
-	border-width: 0.5px;
+	border-width: 0.6px;
 }
 
 .filter-container-right{
-	border-left-style: none;
+	border-left-width: 0.3px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .filter-container-left{
-	border-right-style: none;
+	border-right-width: 0.3px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.filter-container-middle{
+    border-left-width: 0.3px;
+    border-right-width: 0.3px;
 }
 
 .filter-list{
@@ -90,4 +99,17 @@ img {
 
 .filter-element-text{
     cursor: default;
+    color: rgb(108, 117, 125);
+}
+
+.filter-element-text:hover{
+    color: rgb(108, 117, 125);;
+    background-color: #ffffff;
+    border-color: #6c757d;
+}
+
+#rebuildCardList{
+    display: block;
+    width: 100%;
+    margin-top: 0px;
 }

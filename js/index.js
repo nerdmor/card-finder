@@ -14,7 +14,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 
 class MainController{
     constructor(){
-        this.version = '0.4';
+        this.version = '0.4.1';
         this.cardList = [];
         this.groupedCardList = null;
         this.state = {
@@ -240,98 +240,8 @@ class MainController{
         this.enableInput();
     }
 
-    async createCardFromScryfall(typedName, cardname, quantity){
-        cardname = cardname.replaceAll('\'', '').replaceAll(',', '').replaceAll(':', '').replaceAll('!', '').replaceAll('"', '');
-        var newCard = {
-            'typed_name': typedName,
-            'name': null,
-            'quantity': quantity,
-            'sets': {},
-            'images': {},
-            'rarities': [],
-            'color': null,
-            'cmc': null,
-            'is_land': null,
-            'oracle_id': null,
-            'scryfound': null,
-            'status': '&nbsp;',
-            'selected_set': null,
-            'index': null
-        }
-
-
-        const searchQuery = encodeURI('?unique=prints&q=!"' + cardname + '"');
-        var url = 'https://api.scryfall.com/cards/search' + searchQuery;
-
-        console.log('going to scryfall for ' + typedName + ' (' + cardname + ')');
-        $('#console').html('going to scryfall for ' + typedName);
-        await fetch(url)
-            .then((response) => response.json())
-            .then((data) => {
-                var response_status = data.status || 200;
-                var firstFace = {};
-                var scrycard = {};
-                if(response_status != 200){
-                    console.log('could not find ' + typedName);
-                }else{
-                    for (var i = 0; i < data.data.length; i++) {
-                        scrycard = data.data[i];
-                        if(scrycard.hasOwnProperty('card_faces')){
-                            firstFace = scrycard.card_faces[0];
-                        }else{
-                            firstFace = scrycard;
-                        }
-                        if(newCard.name === null){
-                            newCard.scryfound = true;
-                            newCard.oracle_id = scrycard.oracle_id;
-                            newCard.cmc = scrycard.cmc;
-
-                            newCard.name = firstFace.name;
-                            for (var c = 0; c < firstFace.colors.length; c++) {
-                                newCard.color.push(firstFace.colors[c]);
-                            }
-                            if(firstFace.type_line.indexOf('Land') > -1){
-                                newCard.is_land = true;
-                            }else{
-                                newCard.is_land = false;
-                            }
-                        }
-
-                        newCard.sets[scrycard['set']] = scrycard['rarity'];
-                        newCard.images[scrycard['set']] = firstFace.image_uris.normal;
-                        newCard.rarities.push(scrycard['rarity']);
-                    }
-
-                    newCard.rarities = onlyUnique(newCard.rarities);
-                    if(newCard.rarities.length > 1){
-                        newCard.rarities.sort(function(a, b){
-                            if(a == b) return 0;
-                            if(a == 'common') return -1;
-                            if(a == 'uncommon'){
-                                if(b == 'common') return 1;
-                                else return -1;
-                            }
-                            if(a == 'rare'){
-                                if(b == 'mythic') return -1;
-                                else return 1;
-                            }
-                            if(a == 'mythic') return 1;
-                            return 0;
-                        });
-                    }
-                }
-
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-
-        return newCard;
-    }
-
     displayCards(){
         this.ensureIndex();
-        // TODO: make this respect a given sorting order
         this.groupedCardList = null;
         this.groupedCardList = this.sortCardsByColor();
         this.groupedCardList = this.sortCardsByRarity(this.groupedCardList);
@@ -537,7 +447,7 @@ class MainController{
                 cardRarities.push(rarityDiv);
             }
 
-            card.status = card.status || '&nbsp;';
+            cardStatus = card.status || '&nbsp;';
             cardDiv = window.mainModels.card
                         .replaceAll('%%card_quantity%%', card.quantity)
                         .replaceAll('%%status_icon%%', cardStatus)
@@ -699,6 +609,31 @@ class MainController{
         return result;
     }
 
+    removeCardsWithStatus(status){
+        var newCardList = [];
+        for (var i = 0; i < this.cardList.length; i++) {
+            if(this.cardList[i].status != status){
+                newCardList.push(this.cardList[i]);
+            }
+        }
+        this.cardList = newCardList;
+    }
+
+    reverseListParse(){
+        var result = [];
+        var cardList = JSON.parse(JSON.stringify(this.cardList));
+        cardList.sort(function(a, b) {
+            var textA = a.name.toUpperCase();
+            var textB = b.name.toUpperCase();
+            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+        });
+
+        for (var i = 0; i < cardList.length; i++) {
+            result.push(String(cardList[i].quantity) + ' ' + cardList[i].name);
+        }
+        return result.join('\n');
+    }
+
 }
 
 
@@ -718,7 +653,11 @@ $(function() {
         }else{
             tmp = window.mainController.state.card_status[i];
         }
-        $('#status-filter').append($('<option>', {
+        $('#statusFilter').append($('<option>', {
+            'value': window.mainController.state.card_status[i],
+            'text': tmp
+        }));
+        $('#statusClearSelect').append($('<option>', {
             'value': window.mainController.state.card_status[i],
             'text': tmp
         }));
@@ -750,7 +689,7 @@ $(function() {
         window.mainController.clearCardList();
         $('#color-filter').val('all');
         $('#rarity-filter').val('all');
-        $('#status-filter').val('all');
+        $('#statusFilter').val('all');
     });
 
     $('#storageClear').on('click', function(e) {
@@ -821,14 +760,28 @@ $(function() {
 
     $('#addFilterStatus').on('click', function(e) {
         e.preventDefault();
-        const value = $('#status-filter').val();
-        console.log(value);
+        const value = $('#statusFilter').val();
         if(value != 'all' && !window.mainController.state.filters.status.includes(value)){
             window.mainController.state.filters.status.push(value);
             window.mainController.saveState();
             window.mainController.displayCards();
-            $('#status-filter').val('all');
+            $('#statusFilter').val('all');
         }
+    });
+
+    $('#statusClearBtn').on('click', function(e) {
+        const value = $('#statusClearSelect').val();
+        if(value == 'all'){return;}
+        window.mainController.removeCardsWithStatus(value);
+        window.mainController.saveState();
+        window.mainController.displayCards();
+        $('#statusClearSelect').val('all');
+    });
+
+    $('#rebuildCardList').on('click', function(e) {
+        const newList = window.mainController.reverseListParse();
+        $('#cardListEntry').val(newList);
+        window.mainController.saveState();
     });
 
 });

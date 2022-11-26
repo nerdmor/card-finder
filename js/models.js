@@ -18,7 +18,7 @@ window.mainModels = {
     'filter_element': `
         <div class="filter-element">
           <div class="input-group">
-            <span class="btn btn-sm btn-secondary filter-element-text">%%displayValue%%</span>
+            <span class="btn btn-sm btn-outline-secondary filter-element-text">%%displayValue%%</span>
             <button type="button" class="btn btn-outline-secondary filter-remove-btn" value="%%filterValue%%" filter_type="%%filterType%%">🗑️</button>
           </div>
         </div>`
