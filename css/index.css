@@ -108,8 +108,11 @@ img {
     border-color: #6c757d;
 }
 
-#rebuildCardList{
+.blocky-button{
     display: block;
     width: 100%;
+}
+
+#rebuildCardList{
     margin-top: 0px;
 }
