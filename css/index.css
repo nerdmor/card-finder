@@ -12,6 +12,10 @@
 	margin-top: 4px;
 }
 
+.start-hidden{
+    display: none;
+}
+
 .rarity-symbol{
 	padding: 2px;
 	max-width: 48px;
@@ -86,6 +90,10 @@ img {
     border-right-width: 0.3px;
 }
 
+.filter-control-btn{
+    border-color: #ced4da;
+}
+
 .filter-list{
     padding: 0.5em;
     padding-top: 0.2em;
@@ -109,10 +117,37 @@ img {
 }
 
 .blocky-button{
+    margin-top: 0px;
     display: block;
     width: 100%;
 }
 
-#rebuildCardList{
-    margin-top: 0px;
+.set-icon{
+    width: 100px;
+    height: 100px;
+}
+
+.modern-uncommon{
+    filter: invert(90%) sepia(8%) saturate(7%) hue-rotate(321deg) brightness(92%) contrast(111%);
+}
+
+.modern-rare{
+    filter: invert(78%) sepia(66%) saturate(283%) hue-rotate(351deg) brightness(92%) contrast(80%);
+}
+
+.modern-mythic{
+    filter: invert(64%) sepia(100%) saturate(1434%) hue-rotate(345deg) brightness(98%) contrast(97%);
+}
+
+#control-dash{
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    background-color: #EfEfEf;
+}
+
+#statusClearBtn{
+    background-color: #fff;
+    border-color: #ced4da;
 }

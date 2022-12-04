@@ -12,35 +12,31 @@
       <div id="home" class="container">
         <div class="row mb-3">
           <div id="home_explainer" class="col-4">
-            <h3>Welcome</h3>
-            <p>This is where the explanation of what the site does goes, along with some options</p>
+            <h2>Proto's Card Sorter</h2>
             <span id="versioning"></span>
             <hr>
+            <p>Welcome! Use this tool to help you find the cards that you need in your collection. Add the list to the right, then touch the images to check what you found, need to buy or anything else. Use the filters to sort quicker through the collection. A tablet is recommended.</p>
+            <p>If you enjoy this project, you may check it out on <a href="https://github.com/nerdmor/card-finder">Github</a> or drop me an email (nerdmor<span class="start-hidden">er</span> AT gmail DOT com).</p>
+            <hr>
+            <h4>Options</h4>
             <div class="row">
-              <div class="col-md-12 col-lg-6">
-                <button id="reapply-filters" type="button" class="btn btn-primary list-button input-control blocky-button">Reapply Filters</button>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="optAddFilterOnSelect">
+                <label class="form-check-label" for="optAddFilterOnSelect">Add Filter on select</label>
               </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12 col-lg-6">
-                <button id="rebuildCardList" type="button" class="btn btn-primary list-button input-control blocky-button">Rebuild List</button>
-              </div>
-              <div class="col-md-12 col-lg-6">
-                <div class="input-group">
-                  <select id="statusClearSelect" class="form-select input-control">
-                    <option value="all" selected>Status</option>
-                  </select>
-                  <button id="statusClearBtn" type="button" class="btn btn-outline-secondary filter-control-btn">🗑️</button>
-                </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="optShowSetSymbols">
+                <label class="form-check-label" for="optShowSetSymbols">Show set Symbols</label>
               </div>
             </div>
           </div>
           <div id="home_input" class="col-8">
-            <label for="cardListEntry" class="form-label">Your card list</label>
+            <h2><label for="cardListEntry" class="form-label">Your card list</label></h2>
             <textarea class="form-control input-control" id="cardListEntry" rows="10"></textarea>
             <button id="cardListEntrySubmit" type="button" class="btn btn-primary list-button input-control">Make Find List</button>
             <button id="cardListClear" type="button" class="btn btn-danger list-button input-control">Clear card list</button>
-            <button id="storageClear" type="button" class="btn btn-danger list-button input-control">Clear storage</button>
+            <button id="storageClear" type="button" class="btn btn-danger list-button input-control start-hidden">Clear storage</button>
+            <button id="rebuildCardList" type="button" class="btn btn-success list-button input-control">Rebuild List</button>
           </div>
         </div>
         <div id="console" class="row mb-3">
@@ -91,6 +87,22 @@
             <div id="filterListStatus" class="filter-list">
             </div>
           </div>
+        </div>
+        <div id="control-dash" class="row">
+          <div class="col-md-6 col-lg-4">
+            <div class="input-group">
+              <select id="statusClearSelect" class="form-select input-control">
+                <option value="all" selected>Clear status</option>
+              </select>
+              <button id="statusClearBtn" type="button" class="btn btn-outline-secondary filter-control-btn">🗑️</button>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <button id="reapply-filters" type="button" class="btn btn-primary list-button input-control blocky-button">🔄 Reapply Filters</button>
+          </div>
+        </div>
+        <div class="row">
+          <hr>
         </div>
       </div>
       <div id="displayList" class="container">

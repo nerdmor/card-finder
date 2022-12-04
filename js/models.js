@@ -11,8 +11,12 @@ window.mainModels = {
             </div>
         </div>`,
     'rarity': `
-    	<div class="col-sm-2 rarity-symbol">
+        <div class="col-sm-2 rarity-symbol">
             <img src="img/mtg_%%rarity%%.png">
+        </div>`,
+    'setRarity': `
+        <div class="col-sm-2 rarity-symbol">
+            <img src="%%src%%" class="set-icon modern-%%rarity%%" alt="%%alt%%">
         </div>`,
     'card_row': `<div class="row mb-3 card_row">%%cards%%</div>`,
     'filter_element': `
@@ -23,3 +27,4 @@ window.mainModels = {
           </div>
         </div>`
 };
+

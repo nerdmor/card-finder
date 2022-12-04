@@ -14,14 +14,13 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 
 class MainController{
     constructor(){
-        this.version = '0.4.1';
+        this.version = '0.5.0';
         this.cardList = [];
-        this.groupedCardList = null;
         this.filteredList = null;
+        this.setData = null;
         this.state = {
             'page': 'home',
             'show_rarities': true,
-            'show_set_symbols': false,
             'group_order': ['color', 'rarity', 'cmc'],
             'card_status': [
                 '&nbsp;',
@@ -37,9 +36,14 @@ class MainController{
             },
             'version': this.version,
             'options': {
-                'add_filter_on_select': true
+                'add_filter_on_select': true,
+                'show_set_symbols': false,
+                'debug': false
             }
         };
+        this.invalidSets = [
+            'plist', 'anb', 'prm'
+        ];
         this.loadState();
         this.setBody();
     }
@@ -54,6 +58,8 @@ class MainController{
         if(localStorage.getItem('state')){
             this.cardList = JSON.parse(localStorage.getItem('cardList'));
             this.state = JSON.parse(localStorage.getItem('state'));
+            this.setData = JSON.parse(localStorage.getItem('setData'));
+
             this.state.version = this.state.version || '0.0';
             if(this.state.version != this.version){
                 this.clearAndReload();
@@ -62,10 +68,6 @@ class MainController{
             if(this.state.filters.color == null) this.state.filters.color = [];
             if(this.state.filters.rarity == null) this.state.filters.rarity = [];
             if(this.state.filters.status == null) this.state.filters.status = [];
-
-            if(this.cardList.length > 0){
-                this.displayCards();
-            }
         }else{
             console.log('nothing to load');
         }
@@ -74,11 +76,11 @@ class MainController{
     saveState(){
         localStorage.setItem('state', JSON.stringify(this.state));
         localStorage.setItem('cardList', JSON.stringify(this.cardList));
+        localStorage.setItem('setData', JSON.stringify(this.setData));
     }
 
     clearCardList(){
         this.cardList = [];
-        this.groupedCardList = null;
         this.state.filters.color = [];
         this.state.filters.rarity = [];
         this.state.filters.status = [];
@@ -88,9 +90,70 @@ class MainController{
     }
 
     setBody(){
-        if(this.state == 'home'){
-            $('#home').show();
+        if(this.state.filters.color.length > 0 || this.state.filters.rarity.length > 0 || this.state.filters.status.length > 0)
+            this.populateFilterLists();
+
+        if(this.state.options.show_set_symbols == true) $('#optShowSetSymbols').attr('checked', 'checked');
+        if(this.state.options.add_filter_on_select == true) $('#optAddFilterOnSelect').attr('checked', 'checked');
+        if(this.state.options.debug == true){
+            $('#storageClear').show();
+        }else{
+            $('#storageClear').hide();
         }
+
+
+        if(this.cardList.length > 0){
+            this.displayCards();
+        }
+    }
+
+    async getSetData(){
+        $('#console').html('going to scryfall for set data');
+        var sets = {};
+        var setKeys = [];
+        var card = {};
+        var cardSets = [];
+        var url = '';
+        var setCode = '';
+        const basics = ['plains', 'island', 'swamp', 'mountain', 'forest'];
+        if(this.setData !== null){
+            sets = JSON.parse(JSON.stringify(this.setData));
+        }
+        setKeys = Object.keys(sets);
+
+        for (var i = 0; i < this.cardList.length; i++) {
+            card = this.cardList[i];
+            if(basics.includes(card.name.toLowerCase())) continue;
+            cardSets = Object.keys(card.sets);
+            for (var j = 0; j < cardSets.length; j++) {
+                setCode = cardSets[j];
+                
+                if(setCode.length > 3 && setKeys.includes(setCode.substr(1))){
+                    this.invalidSets.push(setCode);
+                    continue;
+                }
+                if(setKeys.includes(setCode) || this.invalidSets.includes(setCode)) continue;
+                
+                sets[setCode] = '';
+                setKeys.push(setCode);
+                url = 'https://api.scryfall.com/sets/' + setCode;
+                await fetch(url)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if(data.digital == false){
+                            sets[setCode] = data.icon_svg_uri;
+                        }else{
+                            window.mainController.invalidSets.push(data.code);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+
+        this.setData = JSON.parse(JSON.stringify(sets));
+        $('#console').html('');
     }
 
     async parseCardList(){
@@ -238,14 +301,18 @@ class MainController{
         $('#console').html('');
 
         this.cardList = this.cardList.concat(cardList);
-        this.groupedCardList = null;
         this.saveState();
         this.displayCards();
         this.enableInput();
     }
 
-    displayCards(){
-        // this.ensureIndex();
+    async displayCards(){
+        this.blockInput();
+        if(this.state.options.show_set_symbols == true){
+            await this.getSetData();
+
+        }
+        
         this.filteredList = null;
         this.filterCardsByColor();
         this.filterCardsByRarity();
@@ -255,6 +322,7 @@ class MainController{
 
         this.populateDisplayList();
         this.populateFilterLists();
+        this.enableInput();
     }
 
     filterCardsByColor(){
@@ -454,6 +522,8 @@ class MainController{
         var cardRarities = [];
         var cardStatus = '';
         const validColors = ['W', 'U', 'B', 'R', 'G'];
+        const validRarities = ['c', 'u', 'r', 'm'];
+        var rarityLetter = '';
         var keepCard = false;
         for (var i = 0; i < cardList.length; i++) {
             card = cardList[i];
@@ -462,23 +532,30 @@ class MainController{
                 continue;
             }
 
-
-            for (var j = card.rarities.length - 1; j >= 0; j--) {
-                rarityDiv = window.mainModels.rarity;
-                if(card.rarities[j] == 'common'){
-                    rarityDiv = rarityDiv.replaceAll('%%rarity%%', 'c');
-                }else if(card.rarities[j] == 'uncommon'){
-                    rarityDiv = rarityDiv.replaceAll('%%rarity%%', 'u');
-                }else if(card.rarities[j] == 'rare'){
-                    rarityDiv = rarityDiv.replaceAll('%%rarity%%', 'r');
-                }else if(card.rarities[j] == 'mythic'){
-                    rarityDiv = rarityDiv.replaceAll('%%rarity%%', 'm');
-                }else{
-                    rarityDiv = rarityDiv.replaceAll('%%rarity%%', 't');
+            if(this.state.options.show_set_symbols === true){
+                for (const [key, value] of Object.entries(card.sets)) {
+                    if(this.invalidSets.includes(key)){
+                        continue;
+                    }
+                    rarityDiv = window.mainModels.setRarity;
+                    rarityDiv = rarityDiv.replaceAll('%%src%%', this.setData[key]);
+                    rarityDiv = rarityDiv.replaceAll('%%rarity%%', value);
+                    rarityDiv = rarityDiv.replaceAll('%%alt%%', key);
+                    cardRarities.push(rarityDiv);
                 }
-
-                cardRarities.push(rarityDiv);
+            }else{
+                for (var j = card.rarities.length - 1; j >= 0; j--) {
+                    rarityDiv = window.mainModels.rarity;
+                    rarityLetter = card.rarities[j].substr(0, 1);
+                    if(validRarities.includes(rarityLetter)){
+                        rarityDiv = rarityDiv.replaceAll('%%rarity%%', rarityLetter);
+                    }else{
+                        rarityDiv = rarityDiv.replaceAll('%%rarity%%', 't');
+                    }
+                    cardRarities.push(rarityDiv);
+                }
             }
+            
 
             cardStatus = card.status || '&nbsp;';
             cardDiv = window.mainModels.card
@@ -698,6 +775,32 @@ $(function() {
         window.mainController.parseCardList();
     });
 
+    $('body').on('keydown', function(event) {
+        window.pressedKeys = window.pressedKeys || [];
+        if(window.pressedKeys.length >= 10){
+            window.pressedKeys = window.pressedKeys.slice(1);
+        }
+        window.pressedKeys.push(event.which);
+
+        const konami =  [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+        if(window.pressedKeys.length == konami.length){
+            var success = true;
+            for (var i = 0; i < konami.length; i++) {
+                if(konami[i] != window.pressedKeys[i]){
+                    success = false;
+                    break;
+                }
+            }
+        }
+
+
+        if(success){
+            window.mainController.state.options.debug = true;
+            window.mainController.saveState();
+            $('#console').html('Debug mode activated');
+        }
+    });
+
     $('#displayList').on('click', '.card-div', function(e) {
         var cardIndex = parseInt($(this).attr('card_index'));
         var currentStatus = window.mainController.cardList[cardIndex].status;
@@ -815,6 +918,19 @@ $(function() {
     });
 
     $('#reapply-filters').on('click', function(e){
+        window.mainController.displayCards();
+    });
+
+    $('#optAddFilterOnSelect').on('change', function(e) {
+        const val = $(this).is(":checked");
+        window.mainController.state.options.add_filter_on_select = val;
+        window.mainController.saveState();
+        window.mainController.displayCards();
+    });
+    $('#optShowSetSymbols').on('change', function(e) {
+        const val = $(this).is(":checked");
+        window.mainController.state.options.show_set_symbols = val;
+        window.mainController.saveState();
         window.mainController.displayCards();
     });
 
