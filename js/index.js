@@ -933,5 +933,10 @@ $(function() {
         window.mainController.saveState();
         window.mainController.displayCards();
     });
+    $('#legal-modal-caller').on('click', function(event) {
+        event.preventDefault();
+        var modalLegal = new bootstrap.Modal(document.getElementById('modal-legal'));
+        modalLegal.show()
+    });
 
 });

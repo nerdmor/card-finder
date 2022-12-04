@@ -9,6 +9,33 @@
   </head>
   <body>
     <main>
+      <!-- modal -->
+      <div class="modal" tabindex="-1" id="modal-legal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Legal Stuff</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h2>General</h2>
+              <p>The site is © Felipe Raffani, 2022. The code is open source and can be found <a href="https://github.com/nerdmor/card-finder" target="_blank">here</a></p>
+              <p>Card names, images, set, and color symbols are owned by Wizards of the Coast.</p>
+              <p>Card finding, icons and data are provided by <a href="https://scryfall.com" target="_blank">Scryfall</a>. Thank you, guys. the MtG world would not be the same without you.</p>
+              <p>This site uses the <a href="https://en.wikipedia.org/wiki/Konami_Code" target="_blank">Konami Kode</a> for some hidden functionality. I don't recommend you try it.</p>
+
+              <h2>Privacy Policy</h2>
+              <p>I don't record any information about you. No data about your use of this site is transmitted to any service that I control.</p>
+              <p>I do use local storage to persist data between your uses of this site, but that is not transmitted, nor can it be used to identify you or your behaviour in this site.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end modal -->
+
       <div id="home" class="container">
         <div class="row mb-3">
           <div id="home_explainer" class="col-4">
@@ -16,7 +43,8 @@
             <span id="versioning"></span>
             <hr>
             <p>Welcome! Use this tool to help you find the cards that you need in your collection. Add the list to the right, then touch the images to check what you found, need to buy or anything else. Use the filters to sort quicker through the collection. A tablet is recommended.</p>
-            <p>If you enjoy this project, you may check it out on <a href="https://github.com/nerdmor/card-finder">Github</a> or drop me an email (nerdmor<span class="start-hidden">er</span> AT gmail DOT com).</p>
+            <p>If you enjoy this project, you may check it out on <a href="https://github.com/nerdmor/card-finder" target="_blank">Github</a> or drop me an email (nerdmor<span class="start-hidden">er</span> AT gmail DOT com).</p>
+            <p>See legal stuff <a id="legal-modal-caller" href="#">here</a>
             <hr>
             <h4>Options</h4>
             <div class="row">
