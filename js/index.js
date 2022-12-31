@@ -507,6 +507,7 @@ class MainController{
     populateDisplayList(){
         console.log('calling populateDisplayList')
         $('#console').html('Thinking, please wait');
+        this.ensureIndex();
         var cardList = [];
         if(this.filteredList != null){
             cardList = this.filteredList.slice();
@@ -561,7 +562,7 @@ class MainController{
             cardDiv = window.mainModels.card
                         .replaceAll('%%card_quantity%%', card.quantity)
                         .replaceAll('%%status_icon%%', cardStatus)
-                        .replaceAll('%%card_index%%', card.index)
+                        .replaceAll('%%card_index%%', i)
                         .replaceAll('%%rarity_row%%', cardRarities.join('\n'));
 
             for (const [key, value] of Object.entries(card.images)) {
