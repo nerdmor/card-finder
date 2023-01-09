@@ -5,11 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Proto's CardFinder</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <link href="css/index.css" rel="stylesheet">
   </head>
   <body>
     <main>
-      <!-- modal -->
+      <!-- modal block ############################################################################# -->
+      <!-- Loading Modal -->
+      <div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title fs-5" id="loadingModalLabel">Loading</h3>
+            </div>
+            <div class="modal-body">
+              <div class="d-flex align-items-center">
+                <span id="loadingModalText"></span>
+                <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert Modal -->
+      <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 id="alertModalLabel" class="modal-title fs-5"></h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="alertModalBody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Status Modal -->
+      <div class="modal fade" id="addStatusModal" tabindex="-1" aria-labelledby="addStatusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 id="addStatusModalLabel" class="modal-title fs-5">Add Status</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="addStatusModalBody" class="modal-body">
+              <p>Enter an emoji to use as a symbol in the box below, or select one of the suggestions, then click add.<br>A symbol may not be present twice in the status list.</p>
+              <div id="statusSuggestionList">
+              </div>
+
+              <div id="custom-status-group" class="row">
+                  <div class="col-2">
+                    <input type="text" class="form-control" id="custom-status" maxlength=2>
+                  </div>
+                  <div class="col-4">
+                    <button id="add-custom-status" type="button" class="btn btn-primary">Add custom</button>
+                  </div>
+                  <div class="col-6"><span id="custom-status-alert-area" class="alert alert-danger start-hidden"></span></div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Select card version Modal -->
+      <div class="modal fade" id="selectCardVersionModal" tabindex="-1" aria-labelledby="selectCardVersionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 id="selectCardVersionModalLabel" class="modal-title fs-5">Select card version</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="selectCardVersionModalBody" class="modal-body">
+              <p>Select a version of the card to display</p>
+              <div id="selectCardVersionList" class="row">
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- legal modal -->
       <div class="modal" tabindex="-1" id="modal-legal">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -20,13 +108,13 @@
             <div class="modal-body">
               <h2>General</h2>
               <p>The site is © Felipe Raffani, 2022. The code is open source and can be found <a href="https://github.com/nerdmor/card-finder" target="_blank">here</a></p>
-              <p>Card names, images, set, and color symbols are owned by Wizards of the Coast.</p>
-              <p>Card finding, icons and data are provided by <a href="https://scryfall.com" target="_blank">Scryfall</a>. Thank you, guys. the MtG world would not be the same without you.</p>
+              <p>Card names, images, set, and color symbols are owned by Wizards of the Coast. Thanks for making this game.</p>
+              <p>Card search, icons and data are provided by <a href="https://scryfall.com" target="_blank">Scryfall</a>. Thank you, guys. The MtG world wouldn't be the same without you.</p>
               <p>This site uses the <a href="https://en.wikipedia.org/wiki/Konami_Code" target="_blank">Konami Kode</a> for some hidden functionality. I don't recommend you try it.</p>
 
               <h2>Privacy Policy</h2>
               <p>I don't record any information about you. No data about your use of this site is transmitted to any service that I control.</p>
-              <p>I do use local storage to persist data between your uses of this site, but that is not transmitted, nor can it be used to identify you or your behaviour in this site.</p>
+              <p>I do use local storage to persist data between your uses of this site, but that is not transmitted, nor can it be used to identify you or your behaviour in this site in any way.</p>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -34,108 +122,304 @@
           </div>
         </div>
       </div>
-      <!-- end modal -->
 
-      <div id="home" class="container">
-        <div class="row mb-3">
-          <div id="home_explainer" class="col-sm-12 col-md-4">
-            <h2>Proto's Card Sorter</h2>
-            <span id="versioning"></span>
-            <hr>
-            <p>Welcome! Use this tool to help you find the cards that you need in your collection. Add the list to the right, then touch the images to check what you found, need to buy or anything else. Use the filters to sort quicker through the collection. A tablet is recommended.</p>
-            <p>If you enjoy this project, you may check it out on <a href="https://github.com/nerdmor/card-finder" target="_blank">Github</a> or drop me an email (nerdmor<span class="start-hidden">er</span> AT gmail DOT com).</p>
-            <p>See legal stuff <a id="legal-modal-caller" href="#">here</a>
-            <hr>
-            <h4>Options</h4>
-            <div class="row">
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="optAddFilterOnSelect">
-                <label class="form-check-label" for="optAddFilterOnSelect">Add Filter on select</label>
-              </div>
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="optShowSetSymbols">
-                <label class="form-check-label" for="optShowSetSymbols">Show set Symbols</label>
-              </div>
-            </div>
-          </div>
-          <div id="home_input" class="col-sm-12 col-md-8">
-            <h2><label for="cardListEntry" class="form-label">Your card list</label></h2>
-            <textarea class="form-control input-control" id="cardListEntry" rows="10"></textarea>
-            <button id="cardListEntrySubmit" type="button" class="btn btn-primary list-button input-control">Make Find List</button>
-            <button id="cardListClear" type="button" class="btn btn-danger list-button input-control">Clear card list</button>
-            <button id="storageClear" type="button" class="btn btn-danger list-button input-control start-hidden">Clear storage</button>
-            <button id="rebuildCardList" type="button" class="btn btn-success list-button input-control">Rebuild List</button>
-          </div>
-        </div>
-        <div id="console" class="row mb-3">
-        </div>
-      </div>
-      <div id="filter-control" class="container">
-        <div class="row">
-          <div class="col-sm-12 col-md-4 filter-container filter-container-left">
-            <div class="input-group filter-controller">
-              <select id="color-filter" class="form-select input-control">
-                <option value="all" selected>Color</option>
-                <option value="W">White</option>
-                <option value="U">Blue</option>
-                <option value="B">Black</option>
-                <option value="R">Red</option>
-                <option value="G">Green</option>
-                <option value="multi">Multicolor</option>
-                <option value="c">Colorless</option>
-                <option value="land">Land</option>
-              </select>
-              <button id="addFilterColor" type="button" class="btn btn-outline-secondary filter-control-btn">➕</button>
-            </div>
-            <div id="filterListColor" class="filter-list">
-            </div>
-          </div>
-          <div class="col-sm-12 col-md-4 filter-container filter-container-center">
-            <div class="input-group filter-controller">
-              <select id="rarity-filter" class="form-select input-control">
-                <option value="all" selected>Rarity</option>
-                <option value="common">Common</option>
-                <option value="uncommon">Uncommon</option>
-                <option value="rare">Rare</option>
-                <option value="mythic">Mythic</option>
-                <option value="special">Special</option>
-              </select>
-              <button id="addFilterRarity" type="button" class="btn btn-outline-secondary filter-control-btn">➕</button>
-            </div>
-            <div id="filterListRarity" class="filter-list">
-            </div>
-          </div>
-          <div class="col-sm-12 col-md-4 filter-container filter-container-right">
-            <div class="input-group filter-controller">
-              <select id="statusFilter" class="form-select input-control">
-                <option value="all" selected>Status</option>
-              </select>
-              <button id="addFilterStatus" type="button" class="btn btn-outline-secondary filter-control-btn">➕</button>
-            </div>
-            <div id="filterListStatus" class="filter-list">
-            </div>
-          </div>
-        </div>
-        <div id="control-dash" class="row">
-          <div class="col-md-6 col-lg-4">
-            <div class="input-group">
-              <select id="statusClearSelect" class="form-select input-control">
-                <option value="all" selected>Clear status</option>
-              </select>
-              <button id="statusClearBtn" type="button" class="btn btn-outline-secondary filter-control-btn">🗑️</button>
-            </div>
-          </div>
-          <div class="col-md-6 col-lg-4">
-            <button id="reapply-filters" type="button" class="btn btn-primary list-button input-control blocky-button">🔄 Reapply Filters</button>
-          </div>
-        </div>
-        <div class="row">
-          <hr>
-        </div>
-      </div>
-      <div id="displayList" class="container">
-      </div>
 
+
+
+      <!-- end modal block ######################################################################### -->
+
+      <div class="container">
+        <div class="accordion accordion-flush" id="mainAccordion">
+
+          <!-- ###### Debug ###### -->
+          <div id="debugAccordion" class="accordion-item start-hidden debug-item">
+            <h2 class="accordion-header" id="debugHeading">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#debugCollapse" aria-expanded="true" aria-controls="debugCollapse">
+                Debug Menu
+              </button>
+            </h2>
+            <div id="debugCollapse" class="accordion-collapse collapse show" aria-labelledby="debugHeading" data-bs-parent="#mainAccordion">
+              <div class="accordion-body">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <button id="btnDebugClearStorage" type="button" class="btn btn-primary btn-sm">Clear Storage</button>
+                      <button id="btnDebugClearCards" type="button" class="btn btn-primary btn-sm">Clear Cards</button>
+                      <button id="btnDebugClearConsole" type="button" class="btn btn-primary btn-sm">Clear Debug Console</button>
+                    </div>
+                  </div>
+                  <div id="debugConsole" class="row">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ###### Card Input ###### -->
+          <div id="cardInputAccordion" class="accordion-item">
+            <h2 class="accordion-header" id="headingCardInput">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCardInput" aria-expanded="false" aria-controls="collapseCardInput">
+                Card Input
+              </button>
+            </h2>
+            <div id="collapseCardInput" class="accordion-collapse collapse show" aria-labelledby="headingCardInput">
+              <div class="accordion-body">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-md-4 col-sm-12">
+                      <h2>Proto's Card Sorter</h2>
+                      <span id="versioning"></span>
+                      <hr>
+                      <p>Welcome! Use this tool to help you find the cards that you need in your collection. Add the list of cards you need to find in the textbox, then touch the images to check what you found, need to buy or anything else. Use the filters to sort quicker through the collection. A tablet is recommended.</p>
+                      <p>If you enjoy this project, you may check it out on <a href="https://github.com/nerdmor/card-finder" target="_blank">Github</a> or drop me an email (nerdmor<span class="start-hidden">er</span>@gmail.com).</p>
+                      <p>See legal stuff <a id="legalModalCaller" href="#">here</a>
+                    </div>
+                    <div class="col-md-8 col-sm-12">
+                      <h2><label for="cardListEntry" class="form-label">Your card list</label></h2>
+                      <textarea id="cardListEntry" class="form-control input-control" rows="10"></textarea>
+                      <button id="cardListEntrySubmit" type="button" class="btn btn-primary list-button input-control">Make Find List</button>
+                      <button id="cardListClear" type="button" class="btn btn-danger list-button input-control">Clear card list</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ###### SETTINGS ###### -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSettings">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSettings" aria-expanded="true" aria-controls="collapseSettings">
+                Settings
+              </button>
+            </h2>
+            <div id="collapseSettings" class="accordion-collapse collapse" aria-labelledby="headingSettings" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <div class="row">
+                  <div class="col-sm-12 col-md-4">
+                    <div class="row settings-title">
+                      <h5>General Settings</h5>
+                    </div>
+                    <div class="row settings-body">
+                      <div class="form-check form-switch">
+                        <input id="settingsApplyFilters" class="form-check-input" type="checkbox" role="switch">
+                        <label class="form-check-label" for="settingsApplyFilters">Apply filters on change</label>
+                      </div>
+
+                      <div class="form-check form-switch">
+                        <input id="settingsShowSet" class="form-check-input" type="checkbox" role="switch">
+                        <label class="form-check-label" for="settingsShowSet">Show set symbols</label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="col-sm-12 col-md-4">
+                    <div class="row settings-title">
+                      <h5>Sorting options</h5>
+                    </div>
+                    <div class="row settings-body">
+                      <div id="sorter-block" class="col-12">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-12 col-md-4">
+                    <div class="row settings-title">
+                      <h5>Status List</h5>
+                    </div>
+                    <div class="row settings-body">
+                      <div class="col-12">
+                        <div id="cardStatusList">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- ###### Filters ###### -->
+          <div class="accordion-item">
+            <h2 id="headingFilter" class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilters" aria-expanded="false" aria-controls="collapseFilters">
+                Filters
+              </button>
+            </h2>
+            <div id="collapseFilters" class="accordion-collapse collapse show" aria-labelledby="headingFilter">
+              <div class="accordion-body">
+                <div class="row">
+
+                  <!-- COLOR FILTERS -->
+                  <div class="col-sm-12 col-md-4">
+                    <div class="row">
+                      <div class="col-12 filterGroup-title">
+                        <h4>Color</h4>
+                      </div>
+                    </div>
+                    <div class="row filterGroup-body">
+                      <div class="col-6">
+                        <div class="form-check form-switch color-filter-switch-wrapper">
+                          <input id="filterColorW" class="form-check-input color-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label color-filter-label" for="filterColorW">
+                            <span class="mtgSymbols mtgw">o</span><span class="mtgSymbols">w</span>
+                          </label>
+                        </div>
+                        <div class="form-check form-switch color-filter-switch-wrapper">
+                          <input id="filterColorU" class="form-check-input color-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label color-filter-label" for="filterColorU">
+                            <span class="mtgSymbols mtgu">o</span><span class="mtgSymbols">u</span>
+                          </label>
+                        </div>
+                        <div class="form-check form-switch color-filter-switch-wrapper">
+                          <input id="filterColorB" class="form-check-input color-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label color-filter-label" for="filterColorB">
+                            <span class="mtgSymbols mtgb">o</span><span class="mtgSymbols">b</span>
+                          </label>
+                        </div>
+                        <div class="form-check form-switch color-filter-switch-wrapper">
+                          <input id="filterColorR" class="form-check-input color-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label color-filter-label" for="filterColorR">
+                            <span class="mtgSymbols mtgr">o</span><span class="mtgSymbols">r</span>
+                          </label>
+                        </div>
+                        <div class="form-check form-switch color-filter-switch-wrapper">
+                          <input id="filterColorG" class="form-check-input color-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label color-filter-label" for="filterColorG">
+                            <span class="mtgSymbols mtgg">o</span><span class="mtgSymbols">g</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="col-6">
+                        <div class="form-check form-switch color-filter-switch-wrapper">
+                          <input id="filterColorC" class="form-check-input color-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label color-filter-label" for="filterColorC">
+                            <span class="mtgSymbols mtgc">o</span><span class="mtgGlyphs">c</span>
+                          </label>
+                        </div>
+                        <div class="form-check form-switch color-filter-switch-wrapper">
+                          <input id="filterColorLand" class="form-check-input color-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label color-filter-label" for="filterColorLand">
+                            <span class="mtgSymbols mtgl">o</span><span class="mtgFuture">l</span>
+                          </label>
+                        </div>
+                        <div class="form-check form-switch color-filter-switch-wrapper">
+                          <input id="filterColorMulti" class="form-check-input color-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label color-filter-label" for="filterColorMulti">
+                            <span class="mtgSymbols mtgm">o</span><span class="mtgSymbols font80p">c</span>
+                          </label>
+                        </div>
+
+                        <!-- all/none -->
+                        <div class="filter-buttons-group">
+                          <button id="filterColorAll" type="button" class="btn btn-primary btn-sm">Add All</button>
+                          <button id="filterColorNone" type="button" class="btn btn-primary btn-sm">Remove All</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- END COLOR FILTERS -->
+
+
+                  <!-- RARITY FILTERS -->
+                  <div class="col-sm-12 col-md-4">
+                    <div class="row">
+                      <div class="col-12 filterGroup-title">
+                        <h4>Rarity</h4>
+                      </div>
+                    </div>
+                    <div id="filtergroup-rarity-body" class="row filterGroup-body">
+                      <div class="col-6">
+                        <!-- common -->
+                        <div class="form-check form-switch">
+                          <input id="filterRarityCommon" class="form-check-input rarity-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label rarity-filter-label" for="filterRarityCommon">
+                            <img src="img/mtg_c.png" class="rarity-filter-symbol" alt="common">
+                          </label>
+                        </div>
+
+                        <!-- uncommon -->
+                        <div class="form-check form-switch">
+                          <input id="filterRarityUncommon" class="form-check-input rarity-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label rarity-filter-label" for="filterRarityUncommon">
+                            <img src="img/mtg_u.png" class="rarity-filter-symbol" alt="Uncommon">
+                          </label>
+                        </div>
+
+                        <!-- rare -->
+                        <div class="form-check form-switch">
+                          <input id="filterRarityRare" class="form-check-input rarity-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label rarity-filter-label" for="filterRarityRare">
+                            <img src="img/mtg_r.png" class="rarity-filter-symbol" alt="Rare">
+                          </label>
+                        </div>
+
+                        <!-- mythic -->
+                        <div class="form-check form-switch">
+                          <input id="filterRarityMythic" class="form-check-input rarity-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label rarity-filter-label" for="filterRarityMythic">
+                            <img src="img/mtg_m.png" class="rarity-filter-symbol" alt="Mythic">
+                          </label>
+                        </div>
+
+                        <!-- special -->
+                        <div class="form-check form-switch">
+                          <input id="filterRaritySpecial" class="form-check-input rarity-filter-switch" type="checkbox" role="switch">
+                          <label class="form-check-label rarity-filter-label" for="filterRaritySpecial">
+                            <img src="img/mtg_s.png" class="rarity-filter-symbol" alt="Special">
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="col-6">
+                        <!-- all/none -->
+                        <div class="filter-buttons-group">
+                          <button id="filterRarityAll" type="button" class="btn btn-primary btn-sm">Add All</button>
+                          <button id="filterRarityNone" type="button" class="btn btn-primary btn-sm">Remove All</button>
+                        </div>
+                      </div>
+
+
+                    </div>
+                  </div>
+
+                  <!-- STATUS FILTERS -->
+                  <div class="col-sm-12 col-md-4">
+                    <div class="row">
+                      <div class="col-12 filterGroup-title">
+                        <h4>Status</h4>
+                      </div>
+                    </div>
+                    <div id="filter-status-body" class="row filterGroup-body">
+                      <div id="filterStatusList" class="col-6">
+                      </div>
+                      <div class="col-6">
+                        <button id="filterStatusAll" type="button" class="btn btn-primary btn-sm">Add All</button>
+                        <button id="filterStatusNone" type="button" class="btn btn-primary btn-sm">Remove All</button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div id="filterApply" class="row">
+                  <button id="btnFilterApply" type="button" class="btn btn-primary">Apply Filters</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+          <!-- ###### Card Display ###### -->
+          <div class="container">
+            <div id="cardListDisplay" class="row">
+            </div>
+          </div>
+      </div>
+      
     </main>
 
     <!-- scripts -->
@@ -144,6 +428,8 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     <!-- custom -->
     <script type="text/javascript" src="js/models.js"></script>
+    <script type="text/javascript" src="js/functions.js"></script>
+    <script type="text/javascript" src="js/classes.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
 
   </body>

@@ -1,14 +1,119 @@
+@font-face {
+  font-family: "MagicSymbols";
+  src: url('fonts/MagicSymbols.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "Future Sight Card Type Symbols";
+  src: url('fonts/Future Sight Card Type Symbols.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: "MTG-glyphs";
+  src: url('fonts/MTG-glyphs.ttf') format('truetype');
+}
+
+.mtgSymbols{
+    font-family: MagicSymbols;
+}
+
+.mtgFuture{
+    font-family: Future Sight Card Type Symbols;
+    padding-left: 0.14em;
+}
+
+.mtgGlyphs{
+    font-family: MTG-glyphs;
+    padding-left: 0.14em;
+}
+
+.mtgw{ color: #fffdea; }
+.mtgu{ color: #a8e0f9; }
+.mtgb{ color: #d5cfcf; }
+.mtgr{ color: #fcb392; }
+.mtgg{ color: #a6debb; }
+.mtgc{ color: #d5cfcf; }
+.mtgl{ color: #89713d; }
+.mtgm{ color: #dcbd73; }
+
+.font80p{
+    font-size: 90%;
+}
+
+.color-filter-label{
+    font-size: 2em;
+}
+
+.filterGroup-title{
+    text-align: center;
+    background-color: #DFDFDF;
+    border-left-style: solid;
+    border-left-width: 0.5px;
+    border-left-color: #D0D0D0;
+    border-right-style: solid;
+    border-right-width: 0.5px;
+    border-right-color: #D0D0D0;
+}
+
+.filterGroup-body{
+    min-height: 12em;
+    background-color: #EFEFEF;
+    border-left-style: solid;
+    border-left-width: 0.5px;
+    border-left-color: #D0D0D0;
+    border-right-style: solid;
+    border-right-width: 0.5px;
+    border-right-color: #D0D0D0;
+}
+
+.color-filter-switch{
+    margin-top: 1.2em;
+}
+
+.color-filter-switch-wrapper{
+    height: 2.1em;
+}
+
+.rarity-filter-symbol{
+    height: 2em;
+    width: 2em;
+}
+
+.rarity-filter-switch{
+    margin-top: 0.6em;
+}
+
 #console{
 	background-color: #090909;
 	color: #00FF09;
 	font-family: Courier New;
 }
 
+#debugConsole{
+    background-color: #090909;
+    color: #00FF09;
+    font-family: Courier New;
+    size: 10px;
+    margin: 5px 0px 0px 5px;
+    max-height: 200px;
+    overflow: scroll;
+}
+
+#debugConsole p{
+    display: block;
+    float: left;
+    margin-bottom: 3px;
+}
+
 .list-button{
 	margin-top: 6px;
 }
 
-.card-div{
+.filter-buttons-group{
+    margin-top: 1em;
+}
+
+.card-div-wrapper{
 	margin-top: 4px;
 }
 
@@ -17,17 +122,31 @@
 }
 
 .rarity-symbol{
+    display: inline-flex;
+    float: right;
 	padding: 2px;
-	max-width: 48px;
-	max-height: 48px;
-	background-color: #F0F0F0;
+    min-width: 16px;
+    min-width: 16px;
+	max-width: 32px;
+	max-height: 32px;
+	background-color: #FAFAFA;
 	border-color: #0A0A0A;
 	border-style: solid;
 	border-width: 0.5px;
 	border-radius: 5px;
+    z-index: 1;
 }
 
 .quantity-box{
+    padding: 2px;
+    width: 17%;
+    max-width: 48px;
+    max-height: 48px;
+    background-color: #FAFAFA;
+    border-color: #0A0A0A;
+    border-style: solid;
+    border-width: 0.5px;
+    border-radius: 5px;
 	text-align: center;
 	color: #0A0A0A;
 	font-size: 1em;
@@ -36,13 +155,32 @@
 	text-overflow: ellipsis;
 	word-wrap: break-word;
 	display: inline-flex;
-	/*line-height: 1em;*/
-	/*max-height: 1em;*/
+}
+
+.settings-title{
+    text-align: center;
+    font-weight: 200;
+}
+
+#filtergroup-rarity-body{
+    padding-top: 0.4em;
+}
+
+.accordion-button{
+    background-color: #fefefe;
 }
 
 .rarity-row{
-	padding-left: 0.1em;
-	margin-top: -54px;
+    position: relative;
+    display: block;
+    float: right;
+    top: -5em;
+}
+.quantity-row{
+    position: relative;
+    display: block;
+    top: -6em;
+    padding-left: 0.1em;
 }
 
 img {
@@ -51,13 +189,16 @@ img {
 }
 
 .status-icon{
+    position: relative;
+    display: block;
+    width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	word-wrap: break-word;
-	display: inline-flex;
 	text-align: center;
 	margin-top: -1.7em;
-	font-size: 6.5em;
+	font-size: 8em;
+    z-index: 10;
 }
 
 #versioning{
@@ -123,12 +264,12 @@ img {
 }
 
 .set-icon{
-    width: 100px;
-    height: 100px;
+    width: 24px;
+    height: 24px;
 }
 
 .modern-uncommon{
-    filter: invert(90%) sepia(8%) saturate(7%) hue-rotate(321deg) brightness(92%) contrast(111%);
+    filter: invert(54%) sepia(7%) saturate(268%) hue-rotate(169deg) brightness(96%) contrast(88%);
 }
 
 .modern-rare{
@@ -137,6 +278,10 @@ img {
 
 .modern-mythic{
     filter: invert(64%) sepia(100%) saturate(1434%) hue-rotate(345deg) brightness(98%) contrast(97%);
+}
+
+.modern-special{
+    filter: invert(48%) sepia(24%) saturate(673%) hue-rotate(243deg) brightness(100%) contrast(88%);
 }
 
 #control-dash{
@@ -150,4 +295,82 @@ img {
 #statusClearBtn{
     background-color: #fff;
     border-color: #ced4da;
+}
+
+#alertModalBody{
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+#filter-status-body{
+    padding-top: 0.5em;
+}
+
+.status-button-group-wrapper{
+    width: 100%;
+/*    padding-right: 30%;*/
+    text-align: center;
+    margin-top: 0.2em;
+}
+
+.status-options-btn-add{
+    max-width: 50%;
+    width: 174px;
+}
+
+.btn-emoji-suggestion{
+    margin-bottom: 0.2em;
+}
+
+#custom-status-group{
+    margin-top: 0.2em;
+    border-top-style: solid;
+    border-top-color: #1F1F1F;
+    border-top-width: 0.5px;
+    padding-top: 0.5em;
+}
+
+.status-options-btn-up{
+    width: 42px;
+    height: 38px;
+}
+.status-options-btn-down{
+    width: 42px;
+    height: 38px;
+}
+.status-options-btn-remove{
+    width: 42px;
+    height: 38px;
+}
+.status-options-btn-display{
+    width: 48px;
+    height: 38px;
+}
+
+#custom-status-alert-area{
+    display: flex;
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
+}
+
+.selectCardHolder{
+    margin-bottom: 0.5em;
+}
+
+.card-version-selector{
+    border-style: solid;
+    border-color: #0F0F0F;
+    border-width: 1px;
+    border-radius: 5px 5px 5px 5px;
+    position: relative;
+    display: block;
+    left: -5%;
+    z-index: 20;
+    width: 28px;
+    height: 28px;
+    text-align: center;
+    float: right;
+    top: 15%;
+    background: rgba(100%, 100%, 100%, 0.75);
+    padding: 0.1em 0.1em 0.1em 0.1em;
 }
