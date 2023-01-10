@@ -1,7 +1,7 @@
 class MainController{
     constructor(){
         // savables
-        this.version = '0.6.0';
+        this.version = '0.10.0';
         this.cards = [];
         this.sets = {};
         this.settings = {
@@ -648,14 +648,6 @@ class MainController{
         this.saveState(['filters', 'cardStatus']);
         if(this.settings.apply_filters_on_select){
             this.drawCards();
-        }
-    }
-
-    toggleFilterApplyButton(){
-        if(this.settings.apply_filters_on_select){
-            $('#filterApplyWrapper').hide();
-        }else{
-            $('#filterApplyWrapper').show();
         }
     }
 
