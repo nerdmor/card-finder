@@ -1,29 +1,20 @@
 @font-face {
-  font-family: "MagicSymbols";
-  src: url('fonts/MagicSymbols.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: "Future Sight Card Type Symbols";
-  src: url('fonts/Future Sight Card Type Symbols.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: "MTG-glyphs";
-  src: url('fonts/MTG-glyphs.ttf') format('truetype');
+  font-family: "mtg2023";
+  src: url('fonts/mtg2023.ttf') format('truetype');
 }
 
 .mtgSymbols{
-    font-family: MagicSymbols;
+    font-family: mtg2023;
 }
 
 .mtgFuture{
-    font-family: Future Sight Card Type Symbols;
+    font-family: mtg2023;
     padding-left: 0.14em;
+    font-size: 0.65em;
 }
 
 .mtgGlyphs{
-    font-family: MTG-glyphs;
+    font-family: mtg2023;
     padding-left: 0.14em;
 }
 

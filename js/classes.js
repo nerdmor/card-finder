@@ -36,6 +36,7 @@ class MainController{
         this.alertModal = new bootstrap.Modal('#alertModal');
         this.addStatusModal = new bootstrap.Modal('#addStatusModal');
         this.selectCardVersionModal = new bootstrap.Modal('#selectCardVersionModal');
+        this.clearCardsModal = new bootstrap.Modal('#clear-cards-modal');
 
         // function calls
         this.loadState();
@@ -139,7 +140,8 @@ class MainController{
         this.cardQueue = [];
         this.cardErrors = [];
         this.cardNames = [];
-        this.saveState('cards');
+        this.sets = {};
+        this.saveState(['cards', 'sets']);
         this.drawCards();
     }
 
@@ -180,6 +182,20 @@ class MainController{
 
     dismissSelectCardVersionModal(){
         this.selectCardVersionModal.hide();
+    }
+
+    callClearCardsModal(){
+        $('#clear-cards-all').prop('checked', false);
+        this.clearCardsModal.show();
+    }
+
+    clearCardsModalCallback(clearAll){
+        if(clearAll){
+            this.clearAndReload();
+        }else{
+            this.clearCards();
+        }
+        this.clearCardsModal.hide();
     }
 
     makeErrorsModal(){
@@ -355,6 +371,19 @@ class MainController{
         }
     }
 
+    createPrintableCardList(sort=true){
+        var cardList = this.cards.slice();
+        cardList = this.filterCardsByColor(cardList);
+        cardList = this.filterCardsByRarity(cardList);
+        cardList = this.filterCardsByStatus(cardList);
+        if(sort===true){
+            cardList = this.groupAndSortCards(cardList);
+        }else{
+            cardList = this.flattenGroup(cardList);
+        }
+        return cardList;
+    }
+
     async drawCards(){
         if(this.settings.show_set_symbols == true){
             this.ensureSetList();
@@ -366,12 +395,8 @@ class MainController{
             window.sets = deepCopy(this.sets);
         }
 
+        var cardList = this.createPrintableCardList();
         var html = [];
-        var cardList = this.cards.slice();
-        cardList = this.filterCardsByColor(cardList);
-        cardList = this.filterCardsByRarity(cardList);
-        cardList = this.filterCardsByStatus(cardList);
-        cardList = this.groupAndSortCards(cardList);
         for (var i = 0; i < cardList.length; i++) {
             html.push(cardList[i].makeDiv(this.settings.show_set_symbols));
         }
@@ -620,9 +645,17 @@ class MainController{
     }
 
     postProcessFilters(){
-        this.saveState('filters');
+        this.saveState(['filters', 'cardStatus']);
         if(this.settings.apply_filters_on_select){
             this.drawCards();
+        }
+    }
+
+    toggleFilterApplyButton(){
+        if(this.settings.apply_filters_on_select){
+            $('#filterApplyWrapper').hide();
+        }else{
+            $('#filterApplyWrapper').show();
         }
     }
 
@@ -881,6 +914,44 @@ class MainController{
             this.drawCards();
         }
         this.dismissSelectCardVersionModal();
+    }
+
+    clearFilteredCards(){
+        var list = this.createPrintableCardList(false);
+        var oracleIds = [];
+        for (var i = list.length - 1; i >= 0; i--) {
+            if(list[i].oracleId === null) continue;
+            oracleIds.push(list[i].oracleId);
+        }
+
+        var newCardList = [];
+        for (var i = 0; i < this.cards.length; i++) {
+            if(oracleIds.includes(this.cards[i].oracleId)) newCardList.push(this.cards[i].getCopy());
+        }
+
+        this.cards = newCardList;
+        this.ensureCardSanity();
+        this.drawCards();
+    }
+
+    rebuildTextCardList(){
+        var text = [];
+        for (var i = 0; i < this.cards.length; i++) {
+            text.push(`${this.cards[i].quantity} ${this.cards[i].name}`);
+        }
+        text = text.join('\n');
+        $('#cardListEntry').val(text);
+    }
+
+    copyTextCardList(){
+        this.rebuildTextCardList();
+
+        var copyText = document.getElementById("cardListEntry");
+
+        copyText.select();
+        copyText.setSelectionRange(0, 999999999999); // For mobile devices
+
+        navigator.clipboard.writeText(copyText.value);
     }
 
 

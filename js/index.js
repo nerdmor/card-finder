@@ -59,6 +59,9 @@ $(function() {
     $('#cardListEntrySubmit').on('click', function(e) {
         window.controller.loadCardsFromList();
     });
+    $('#cardListClear').on('click', function(e) {
+        window.controller.callClearCardsModal();
+    });
 
     // Card interaction binds ##################################################
     $('#cardListDisplay').on('click', '.card-div', function(e) {
@@ -69,6 +72,14 @@ $(function() {
     $('#cardListDisplay').on('click', '.card-version-selector', function(e) {
         const cardIndex = parseInt($(this).parent().attr('card_index'));
         window.controller.callSelectCardVersionModal(cardIndex)
+    });
+
+    $('#removeFilteredCards').on('click', function(e) {
+        window.controller.clearFilteredCards();
+        window.controller.rebuildTextCardList();
+    });
+    $('#copyCardList').on('click', function(e) {
+        window.controller.copyTextCardList();
     });
 
     //Filter binds #############################################################
@@ -172,6 +183,16 @@ $(function() {
     $('#selectCardVersionList').on('click', '.selectCardHolder', function(e) {
         const index = parseInt($(this).attr('card_index'));
         window.controller.selectCardVersion(index, $(this).attr('code'));
+    });
+
+    // random bindings ######################################################
+    $('#legal-modal-caller').on('click', function(e) {
+        var modalLegal = new bootstrap.Modal(document.getElementById('modal-legal'));
+        modalLegal.show()
+    });
+
+    $('#clear-cards-confirm').on('click', function(e) {
+        window.controller.clearCardsModalCallback($('#clear-cards-all').is(":checked"));
     });
 
 
