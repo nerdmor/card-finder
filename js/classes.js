@@ -1,7 +1,7 @@
 class MainController{
     constructor(){
         // savables
-        this.version = '0.10.0';
+        this.version = '0.10.1';
         this.cards = [];
         this.sets = {};
         this.settings = {
@@ -30,7 +30,7 @@ class MainController{
         // privates
         this.cardQueue = [];
         this.cardErrors = [];
-        this.cardNames = [];
+        this.cardNames = {};
         this.digitalSets = [];
         this.loadingModal = new bootstrap.Modal('#loadingModal', {backdrop: 'static', keyboard: false});
         this.alertModal = new bootstrap.Modal('#alertModal');
@@ -139,7 +139,7 @@ class MainController{
         this.cards = [];
         this.cardQueue = [];
         this.cardErrors = [];
-        this.cardNames = [];
+        this.cardNames = {};
         this.sets = {};
         this.saveState(['cards', 'sets']);
         this.drawCards();
@@ -215,14 +215,13 @@ class MainController{
     }
 
     loadCardsFromList(){
-        // start by calling a loading modal
-        this.callLoadingModal();
-
         var typedList = $('#cardListEntry').val();
         if(!typedList){
-            this.dismissLoadingModal();
             return;
         }
+
+        // start by calling a loading modal
+        this.callLoadingModal();
         typedList = typedList.toLowerCase().split('\n').filter(e => e.length >= 2);
         if(typedList.length < 1){
             this.dismissLoadingModal();
@@ -239,7 +238,7 @@ class MainController{
         this.ensureCardSanity();
         for (var i = 0; i < typedList.length; i++) {
             match = typedList[i].match(reWithNum);
-            typedName = typedList[i];
+            typedName = typedList[i].toLowerCase();
             quantity = 1;
             if(match){
                 typedName = match[2];
@@ -252,13 +251,13 @@ class MainController{
 
             typedName = typedName.replaceAll('\'', '').replaceAll(',', '').replaceAll(':', '').replaceAll('!', '').replaceAll('"', '').trim().toLowerCase();
 
-            if(this.cardNames.includes(typedName)){
+            if(this.cardNames.hasOwnProperty(typedName)){
+                this.cards[this.cardNames[typedName]].quantity = this.cards[this.cardNames[typedName]].quantity + quantity;
                 continue;
             }
 
-            this.cardNames.push(typedName);
-
             cardIndex = this.cards.length;
+            this.cardNames[typedName] = cardIndex;
             newCard = new MtgCard;
             newCard.init(typedName, quantity, cardIndex);
             this.cards.push(newCard);
@@ -279,11 +278,12 @@ class MainController{
         this.cards = this.cards.filter(c => c.error===null);
 
         // 2: ensure index of cards and feed the cardnames
+        this.cardNames = {};
         for (var i = 0; i < this.cards.length; i++) {
             this.cards[i].index = i;
             if(this.cards[i].loaded === true){
-                this.cardNames.push(this.cards[i].name.toLowerCase());
-                this.cardNames.push(this.cards[i].typedName.toLowerCase());
+                this.cardNames[this.cards[i].name.toLowerCase()] = this.cards[i].index;
+                this.cardNames[this.cards[i].typedName.toLowerCase()] = this.cards[i].index;
             }
         }
     }
