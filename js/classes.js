@@ -351,6 +351,20 @@ class MainController{
         this.processScryfallQueue();
     }
 
+    loadScryfallOracleResponse(data, params){
+        this.cards[params.index].loadFromScryfallResponse(data);
+        this.dismissLoadingModal();
+        await delay(200);
+        this.callSelectCardVersionModal(params.index);
+    }
+
+    async getVersionsByOracle(cardIndex){
+        this.dismissSelectCardVersionModal();
+        await delay(200);
+        this.callLoadingModal();
+        window.scryfall.cardOracleId(this.cards[cardIndex].oracleId, (d, p) => window.controller.loadScryfallOracleResponse(d, p), {'index': cardIndex});
+    }
+
     checkSetsLoaded(){
         const keys = Object.keys(this.sets)
         for (var i = keys.length - 1; i >= 0; i--) {
@@ -510,6 +524,7 @@ class MainController{
         }
 
         document.getElementById('selectCardVersionList').innerHTML = html.join('\n');
+        $('#loadMoreCardVersions').attr('card_index', cardIndex);
     }
 
     setFilterToggles(groups = null){
@@ -693,8 +708,10 @@ class MainController{
     }
 
     postProcessStatusChange(){
+        this.filters.status = deepCopy(this.cardStatus.concat(['Null']));
         this.drawStatusFilters();
         this.drawCardStatusOptions();
+        this.setFilterToggles();
         this.saveState(['cardStatus']);
     }
 
@@ -1006,6 +1023,19 @@ class ScryfallClient{
             .catch((error) => {
                 console.error('Error:', error);
             });
+    }
+
+    async cardOracleId(oracleId, callback, params){
+        const url = `${this.baseUrl}/cards/oracle/${oracleId}`;
+        await fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                callback(data, params);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
     }
 }
 

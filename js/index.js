@@ -195,5 +195,9 @@ $(function() {
         window.controller.clearCardsModalCallback($('#clear-cards-all').is(":checked"));
     });
 
+    $('#loadMoreCardVersions').on('click', function(e) {
+        window.controller.getVersionsByOracle(parseInt($(this).attr('card_index')));
+    });
+
 
 });
