@@ -1,7 +1,7 @@
 class MainController{
     constructor(){
         // savables
-        this.version = '0.10.1';
+        this.version = '0.10.2';
         this.cards = [];
         this.sets = {};
         this.settings = {
@@ -351,7 +351,7 @@ class MainController{
         this.processScryfallQueue();
     }
 
-    loadScryfallOracleResponse(data, params){
+    async loadScryfallOracleResponse(data, params){
         this.cards[params.index].loadFromScryfallResponse(data);
         this.dismissLoadingModal();
         await delay(200);
