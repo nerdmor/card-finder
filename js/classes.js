@@ -353,8 +353,9 @@ class MainController{
 
     async loadScryfallOracleResponse(data, params){
         this.cards[params.index].loadFromScryfallResponse(data);
+        this.saveState('cards');
         this.dismissLoadingModal();
-        await delay(200);
+        await delay(1000);
         this.callSelectCardVersionModal(params.index);
     }
 
@@ -362,7 +363,10 @@ class MainController{
         this.dismissSelectCardVersionModal();
         await delay(200);
         this.callLoadingModal();
-        window.scryfall.cardOracleId(this.cards[cardIndex].oracleId, (d, p) => window.controller.loadScryfallOracleResponse(d, p), {'index': cardIndex});
+        await window.scryfall.cardOracleId(this.cards[cardIndex].oracleId,
+                                     (d, p) => window.controller.loadScryfallOracleResponse(d, p),
+                                     {'index': cardIndex}
+                                    );
     }
 
     checkSetsLoaded(){
