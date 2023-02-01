@@ -7,6 +7,7 @@ class MainController{
         this.settings = {
             'apply_filters_on_select': true,
             'apply_status_filter_on_change': false,
+            'use_wakelock': true,
             'show_set_symbols': false,
             'group_order': ['color', 'rarity', 'cmc'],
             'debug': false
@@ -49,6 +50,7 @@ class MainController{
         this.drawCardStatusOptions();
         this.drawOptionalElements();
         this.drawDebugItems();
+        this.handleWakeLock();
         this.drawCards(true);  // forcing filters to make sure that the reload makes SENSE
     }
 
@@ -457,6 +459,12 @@ class MainController{
         }else{
             $('#divStatusFilterApply').show();
         }
+
+        if(window.wakeLockController.active === false){
+            $('#wakeLockSettingsGroup').hide();
+        }else{
+            $('#wakeLockSettingsGroup').show();
+        }
     }
 
     drawStatusSuggestions(){
@@ -618,6 +626,8 @@ class MainController{
     }
 
     setSettingsToggles(){
+        $('#settingsUseWakeLock').prop('checked', this.settings.use_wakelock);
+        $('#settingsApplyStatusFilters').prop('checked', this.settings.apply_status_filter_on_change);
         $('#settingsApplyFilters').prop('checked', this.settings.apply_filters_on_select);
         $('#settingsShowSet').prop('checked', this.settings.show_set_symbols);
     }
@@ -711,9 +721,23 @@ class MainController{
     setSettings(setting, value){
         if(!this.settings.hasOwnProperty(setting)) return;
         this.settings[setting] = value;
-        this.drawOptionalElements();
         this.saveState(['settings']);
+        this.handleWakeLock();
+        this.drawOptionalElements();
         this.drawCards(true);
+    }
+
+    handleWakeLock(){
+        if(!window.wakeLockController) return;
+        if(window.wakeLockController.active === false) return;
+
+        if(this.settings.use_wakelock == true){
+            window.wakeLockController.requestWakeLock();
+            window.wakeLockController.addEventListeners();
+        }else{
+            window.wakeLockController.abortWakeLock();
+            window.wakeLockController.removeEventListeners();
+        }
     }
 
     getSetData(){
@@ -1274,4 +1298,92 @@ class MtgCard{
         copy.fromJson(JSON.parse(JSON.stringify(this)));
         return copy;
     }
+}
+
+
+class WakeLockController{
+    constructor(){
+        this.wakeLock = false;
+        this.active = false;
+        this.relock = false;
+
+        // option 1: window.wakelock exists
+        if('WakeLock' in window && 'request' in window.WakeLock){
+            this.wakeLock = null;
+            this.active = true;
+            this.requestWakeLock = () => {
+                this.wakeLock = new AbortController();
+                const signal = this.wakeLock.signal;
+                window.WakeLock.request('screen', {signal})
+                    .catch((e) => {
+                        if (e.name === 'AbortError') {
+                            console.log('Wake Lock was aborted');
+                        } else {
+                            console.error(`${e.name}, ${e.message}`);
+                        }
+                    });
+                this.relock = true;
+                console.log('Wake Lock is active');
+            };
+
+            this.abortWakeLock = () => {
+                this.wakeLock.abort();
+                this.wakeLock = null;
+                this.relock = false;
+                console.log('Wake Lock released');
+            };
+
+            this.handleVisibilityChange = () => {
+                if (this.wakeLock !== null && document.visibilityState === 'visible' && this.relock == true) {
+                    this.requestWakeLock();
+                }
+            };
+
+        // option 2: navigator.wakelock exists
+        }else if ('wakeLock' in navigator && 'request' in navigator.wakeLock) {
+            this.wakeLock = null;
+            this.active = true;
+            this.requestWakeLock = async () => {
+                try {
+                    this.wakeLock = await navigator.wakeLock.request('screen');
+                    this.wakeLock.addEventListener('release', (e) => {
+                        console.log('Wake Lock was released');
+                    });
+                    this.relock = true;
+                    console.log('Wake Lock is active');
+                }catch(e){
+                    console.error(`${e.name}, ${e.message}`);
+                }
+            };
+
+            this.abortWakeLock = () => {
+                this.wakeLock.release();
+                this.wakeLock = null;
+                this.relock = false;
+                console.log('Wake Lock released');
+            };
+
+            this.handleVisibilityChange = () => {
+                if (this.wakeLock !== null && document.visibilityState === 'visible' && this.relock == true) {
+                    this.requestWakeLock();
+                }
+            };
+        }else{
+            console.error('Wake Lock API not supported.');
+            this.requestWakeLock = async () => {};
+            this.abortWakeLock = async () => {};
+            this.handleVisibilityChange = () => {};
+        }
+    }
+
+    addEventListeners(){
+        document.addEventListener('visibilitychange', () => window.wakeLockController.handleVisibilityChange());
+        document.addEventListener('fullscreenchange', () => window.wakeLockController.handleVisibilityChange());
+    }
+
+    removeEventListeners(){
+        document.removeEventListener('visibilitychange', () => window.wakeLockController.handleVisibilityChange());
+        document.removeEventListener('fullscreenchange', () => window.wakeLockController.handleVisibilityChange());
+    }
+
 }

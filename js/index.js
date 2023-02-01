@@ -7,16 +7,14 @@ var pressedKeys = [];
 
 
 $(function() {
-    window.controller = window.controller || 0;
-    if(window.controller == 0){
-        window.controller = new MainController;
-    }
-
     window.scryfall = window.scryfall || new ScryfallClient;
+    window.wakeLockController = window.wakeLockController || new WakeLockController;
+    window.controller = window.controller || new MainController;
 
     window.addEventListener("error", (event) => {
         window.controller.log(`err: ${event.type}: ${event.message}`);
     });
+
 
     // Tooltips ################################################################
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
@@ -144,6 +142,9 @@ $(function() {
     });
 
     // Settings bindings #######################################################
+    $('#settingsUseWakeLock').on('change', function(e){
+        window.controller.setSettings('use_wakelock', $(this).is(":checked"));
+    });
     $('#settingsApplyFilters').on('change', function(e){
         window.controller.setSettings('apply_filters_on_select', $(this).is(":checked"));
     });
