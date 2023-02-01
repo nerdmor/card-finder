@@ -419,6 +419,7 @@ class MainController{
     }
 
     async drawCards(forceFilters=false){
+        this.log('called drawCards');
         if(this.settings.show_set_symbols == true){
             this.ensureSetList();
             this.getSetData();
@@ -460,6 +461,9 @@ class MainController{
     }
 
     advanceCardStatus(cardIndex){
+        //card_index
+
+
         const currentCardStatus = this.cards[cardIndex].status;
         const currentCardStatusIndex = this.cardStatus.indexOf(currentCardStatus);
 
@@ -472,7 +476,12 @@ class MainController{
         }
 
         this.saveState(['cards']);
-        this.drawCards();
+
+        if(this.settings.apply_filters_on_select == false){
+            $(`.card-div[card_index=${cardIndex}]`).html(this.cards[cardIndex].makeDiv(this.settings.show_set_symbols, true));    
+        }else{
+            this.drawCards();
+        }
     }
 
     filterCardsByColor(cardList){
@@ -1183,13 +1192,20 @@ class MtgCard{
         return true;
     }
 
-    makeDiv(showSets){
-        var html = window.mainModels.card
-            .replaceAll('%%card_index%%', this.index)
-            .replaceAll('%%card_image%%', this.mainImage)
-            .replaceAll('%%card_name%%', this.name)
-            .replaceAll('%%status_symbol%%', (this.status ? this.status : '&nbsp;'))
-            .replaceAll('%%card_quantity%%', this.quantity);
+    makeDiv(showSets, innerOnly=false){
+        var html = '';
+        if(innerOnly === true){
+            html = '%%card_inner%%';
+        }else{
+            html = window.mainModels.card_outer;
+        }
+        html = html.replaceAll('%%card_inner%%', window.mainModels.card_inner);
+
+        html = html.replaceAll('%%card_index%%', this.index)
+                   .replaceAll('%%card_image%%', this.mainImage)
+                   .replaceAll('%%card_name%%', this.name)
+                   .replaceAll('%%status_symbol%%', (this.status ? this.status : '&nbsp;'))
+                   .replaceAll('%%card_quantity%%', this.quantity);
 
         var rarities = [];
         if(showSets == true && !basicLands.includes(this.name.toLowerCase())){

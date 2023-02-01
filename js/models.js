@@ -1,18 +1,22 @@
 window.mainModels = {
-    'card': `
+    'card_outer': `
         <div class="col-sm-6 col-md-3 col-lg-2 card-div-wrapper" card_index="%%card_index%%">
-          <span class="btn btn-light card-version-selector"><i class="bi bi-three-dots"></i></span>
-          <div class="card-div" card_index="%%card_index%%">
-              <img src="%%card_image%%" alt="%%card_name%%">
-              <div class="status-icon">%%status_symbol%%</div>
-              <div class="quantity-row">
-                <div class="col-sm-2 quantity-box">%%card_quantity%%</div>
-              </div>
-             <div class="rarity-row">
-                %%rarities%%
-             </div> 
-          </div>
+            %%card_inner%%
         </div>`,
+
+    'card_inner': `
+        <span class="btn btn-light card-version-selector"><i class="bi bi-three-dots"></i></span>
+        <div class="card-div" card_index="%%card_index%%">
+            <img src="%%card_image%%" alt="%%card_name%%">
+            <div class="status-icon">%%status_symbol%%</div>
+            <div class="quantity-row">
+              <div class="col-sm-2 quantity-box">%%card_quantity%%</div>
+            </div>
+           <div class="rarity-row">
+              %%rarities%%
+           </div> 
+        </div>
+    `,
 
     'rarity': `
         <div class="rarity-symbol">
