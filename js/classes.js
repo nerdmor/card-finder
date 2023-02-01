@@ -299,6 +299,7 @@ class MainController{
             this.makeErrorsModal();
             this.saveState();
             this.drawCards();
+            $('.optional-accordion-body').collapse('hide');
             return;
         }
         const cardIndex = this.cardQueue[0];
