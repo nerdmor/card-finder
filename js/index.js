@@ -135,6 +135,10 @@ $(function() {
         window.controller.removeFilterStatus('all');
     });
 
+    $('#btnStatusFilterApply').on('click', function(e) {
+        window.controller.drawCards(true);
+    });
+
     $('#btnFilterApply').on('click', function(e) {
         window.controller.drawCards(true);
     });
@@ -145,6 +149,9 @@ $(function() {
     });
     $('#settingsShowSet').on('change', function(e){
         window.controller.setSettings('show_set_symbols', $(this).is(":checked"));
+    });
+    $('#settingsApplyStatusFilters').on('change', function(e) {
+       window.controller.setSettings('apply_status_filter_on_change', $(this).is(":checked")); 
     });
 
     $('#cardStatusList').on('click', '.status-options-btn-up', function(e) {

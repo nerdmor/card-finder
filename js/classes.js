@@ -6,6 +6,7 @@ class MainController{
         this.sets = {};
         this.settings = {
             'apply_filters_on_select': true,
+            'apply_status_filter_on_change': false,
             'show_set_symbols': false,
             'group_order': ['color', 'rarity', 'cmc'],
             'debug': false
@@ -449,6 +450,12 @@ class MainController{
         }else{
             $('#filterApply').show();
         }
+
+        if(this.settings.apply_status_filter_on_change == true){
+            $('#divStatusFilterApply').hide();
+        }else{
+            $('#divStatusFilterApply').show();
+        }
     }
 
     drawStatusSuggestions(){
@@ -477,7 +484,7 @@ class MainController{
 
         this.saveState(['cards']);
 
-        if(this.settings.apply_filters_on_select == false){
+        if(this.settings.apply_status_filter_on_change == false){
             $(`.card-div[card_index=${cardIndex}]`).html(this.cards[cardIndex].makeDiv(this.settings.show_set_symbols, true));    
         }else{
             this.drawCards();
@@ -705,7 +712,7 @@ class MainController{
         this.settings[setting] = value;
         this.drawOptionalElements();
         this.saveState(['settings']);
-        this.drawCards();
+        this.drawCards(true);
     }
 
     getSetData(){
