@@ -1,7 +1,7 @@
 class MainController{
     constructor(){
         // savables
-        this.version = '0.10.2';
+        this.version = '0.12.0';
         this.cards = [];
         this.sets = {};
         this.settings = {
