@@ -60,21 +60,21 @@ $(function() {
     $('#cardListClear').on('click', function(e) {
         window.controller.callClearCardsModal();
     });
+    $('#removeFilteredCards').on('click', function(e) {
+        var conf = confirm("Are you sure you want to remove all cards that currently don't appear below?");
+        if(conf === false) return;
+        window.controller.clearFilteredCards();
+        window.controller.rebuildTextCardList();
+    });
 
     // Card interaction binds ##################################################
     $('#cardListDisplay').on('click', '.card-div', function(e) {
         const cardIndex = parseInt($(this).attr('card_index'));
         window.controller.advanceCardStatus(cardIndex);
     });
-
     $('#cardListDisplay').on('click', '.card-version-selector', function(e) {
         const cardIndex = parseInt($(this).parent().attr('card_index'));
         window.controller.callSelectCardVersionModal(cardIndex)
-    });
-
-    $('#removeFilteredCards').on('click', function(e) {
-        window.controller.clearFilteredCards();
-        window.controller.rebuildTextCardList();
     });
     $('#copyCardList').on('click', function(e) {
         window.controller.copyTextCardList();
