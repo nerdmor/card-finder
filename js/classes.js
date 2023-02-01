@@ -48,7 +48,7 @@ class MainController{
         this.drawCardStatusOptions();
         this.drawOptionalElements();
         this.drawDebugItems();
-        this.drawCards();
+        this.drawCards(true);  // forcing filters to make sure that the reload makes SENSE
     }
 
     log(msg){
@@ -354,19 +354,19 @@ class MainController{
     async loadScryfallOracleResponse(data, params){
         this.cards[params.index].loadFromScryfallResponse(data);
         this.saveState('cards');
-        this.dismissLoadingModal();
-        await delay(1000);
+        // this.dismissLoadingModal();
+        // await delay(1000);
         this.callSelectCardVersionModal(params.index);
     }
 
     async getVersionsByOracle(cardIndex){
-        this.dismissSelectCardVersionModal();
-        await delay(200);
+        // this.dismissSelectCardVersionModal();
+        // await delay(200);
         this.callLoadingModal();
         await window.scryfall.cardOracleId(this.cards[cardIndex].oracleId,
-                                     (d, p) => window.controller.loadScryfallOracleResponse(d, p),
-                                     {'index': cardIndex}
-                                    );
+                                           (d, p) => window.controller.loadScryfallOracleResponse(d, p),
+                                           {'index': cardIndex}
+                                          );
     }
 
     checkSetsLoaded(){
@@ -389,11 +389,27 @@ class MainController{
         }
     }
 
-    createPrintableCardList(sort=true){
+    createPrintableCardList(sort=true, suppressFilters=null){
+        if(suppressFilters === null){
+            suppressFilters = [];
+        }else if(typeof suppressFilters == 'string'){
+            suppressFilters = [suppressFilters];
+        }
+
         var cardList = this.cards.slice();
-        cardList = this.filterCardsByColor(cardList);
-        cardList = this.filterCardsByRarity(cardList);
-        cardList = this.filterCardsByStatus(cardList);
+
+        if(!suppressFilters.includes('color')){
+            cardList = this.filterCardsByColor(cardList);
+        }
+
+        if(!suppressFilters.includes('rarity')){
+            cardList = this.filterCardsByRarity(cardList);
+        }
+
+        if(!suppressFilters.includes('status')){
+            cardList = this.filterCardsByStatus(cardList);
+        }
+
         if(sort===true){
             cardList = this.groupAndSortCards(cardList);
         }else{
@@ -402,7 +418,7 @@ class MainController{
         return cardList;
     }
 
-    async drawCards(){
+    async drawCards(forceFilters=false){
         if(this.settings.show_set_symbols == true){
             this.ensureSetList();
             this.getSetData();
@@ -413,7 +429,12 @@ class MainController{
             window.sets = deepCopy(this.sets);
         }
 
-        var cardList = this.createPrintableCardList();
+        var supressedFilters = [];
+        if(this.settings.apply_filters_on_select == false && forceFilters == false){
+            supressedFilters = Object.keys(this.filters);
+        }
+
+        var cardList = this.createPrintableCardList(true, supressedFilters);
         var html = [];
         for (var i = 0; i < cardList.length; i++) {
             html.push(cardList[i].makeDiv(this.settings.show_set_symbols));

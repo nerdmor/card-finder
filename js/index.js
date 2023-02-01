@@ -136,7 +136,7 @@ $(function() {
     });
 
     $('#btnFilterApply').on('click', function(e) {
-        window.controller.drawCards();
+        window.controller.drawCards(true);
     });
 
     // Settings bindings #######################################################
