@@ -442,7 +442,7 @@ class MainController{
         var cardList = this.createPrintableCardList(true, supressedFilters);
         var html = [];
         for (var i = 0; i < cardList.length; i++) {
-            html.push(cardList[i].makeDiv(this.settings.show_set_symbols));
+            html.push(cardList[i].makeDiv(this.settings.show_set_symbols, false));
         }
         $('#cardListDisplay').html(html.join('\n'));
     }
@@ -494,7 +494,7 @@ class MainController{
         this.saveState(['cards']);
 
         if(this.settings.apply_status_filter_on_change == false){
-            $(`.card-div[card_index=${cardIndex}]`).html(this.cards[cardIndex].makeDiv(this.settings.show_set_symbols, true));    
+            $(`.card-div-wrapper[card_index=${cardIndex}]`).html(this.cards[cardIndex].makeDiv(this.settings.show_set_symbols, true));    
         }else{
             this.drawCards();
         }
