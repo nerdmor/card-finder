@@ -1,7 +1,7 @@
 class MainController{
     constructor(){
         // savables
-        this.version = '0.12.0';
+        this.version = '0.12.1';
         this.cards = [];
         this.sets = {};
         this.settings = {
@@ -31,6 +31,8 @@ class MainController{
 
         // privates
         this.cardQueue = [];
+        this.totalQueueSize = 0;
+        this.currentQueueItem = 0;
         this.cardErrors = [];
         this.cardNames = {};
         this.digitalSets = [];
@@ -267,6 +269,9 @@ class MainController{
             this.cardQueue.push(cardIndex);
         }
 
+        this.totalQueueSize = this.cardQueue.length;
+        this.currentQueueItem = 0;
+
         this.processScryfallQueue();
     }
 
@@ -306,7 +311,8 @@ class MainController{
         }
         const cardIndex = this.cardQueue[0];
         this.cardQueue = this.cardQueue.slice(1);
-        this.setLoadingModalText(`Processing ${this.cards[cardIndex].typedName}...`);
+        this.currentQueueItem++;
+        this.setLoadingModalText(`Processing ${this.cards[cardIndex].typedName}... (${this.currentQueueItem}/${this.totalQueueSize})`);
         this.cards[cardIndex].index = cardIndex;
         this.cards[cardIndex].findInScryfall(window.scryfall);
     }
@@ -1166,7 +1172,7 @@ class MtgCard{
             scrycard = data.data[i];
             if(scrycard.digital == true) continue;
 
-            if(scrycard.hasOwnProperty('card_faces') && scrycard.layout != 'split'){
+            if(scrycard.hasOwnProperty('card_faces') && scrycard.layout != 'split' && scrycard.layout != 'adventure'){
                 firstFace = scrycard.card_faces[0];
             }else{
                 firstFace = scrycard;
